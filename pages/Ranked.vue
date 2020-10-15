@@ -17,6 +17,6 @@
 <style scoped>
 .container {
   height: 100%;
-  background: center/contain no-repeat url('/soccer-field-from-above.jpg');
+  background: center/cover no-repeat url('/test.jpg');
 }
 </style>
