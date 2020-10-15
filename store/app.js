@@ -12,4 +12,7 @@ export const mutations = {
   disableOpening(state) {
     state.playOpening = false
   },
+  moveTo(component, direction) {
+    component = direction
+  },
 }

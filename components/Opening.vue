@@ -1,7 +1,9 @@
 <template>
-  <video autoplay @ended="onEnd">
-    <source src="/olive-et-tom-generique-2011-hd-youtube.mp4" />
-  </video>
+  <div>
+    <video autoplay @ended="onEnd">
+      <source src="/olive-et-tom-generique-2011-hd-youtube.mp4" />
+    </video>
+  </div>
 </template>
 
 <script>

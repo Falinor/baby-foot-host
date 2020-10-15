@@ -3,12 +3,13 @@
     <v-row>
       <opening v-if="playOpening" />
     </v-row>
+    <v-btn to="/Ranked"> Partie Classée </v-btn>
+    <v-btn to="/Quickplay"> Partie Rapide </v-btn>
   </v-container>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-
 import Opening from '@/components/Opening'
 
 export default {
