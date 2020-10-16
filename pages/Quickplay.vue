@@ -1,31 +1,53 @@
 <template>
   <v-container fluid class="container">
     <v-btn x-large to="/"> Retour </v-btn>
-    <v-btn v-if="ready4" x-large to="/Match">Ready</v-btn>
+    <v-btn v-if="ready1 & ready2 & ready3 & ready4" x-large to="/Match"
+      >Ready</v-btn
+    >
     <div>
       <dir>
-        <v-progress-circular size="90" width="8" indeterminate color="blue"
+        <v-btn @click="ready1 = true">Add Player</v-btn>
+        <v-progress-circular
+          v-if="!ready1"
+          size="90"
+          width="8"
+          indeterminate
+          color="blue"
           ><div>Player 1</div></v-progress-circular
         >
-        <v-btn @click="ready1 = true">Add Player</v-btn>
       </dir>
       <div>
-        <v-progress-circular size="90" width="8" indeterminate color="red"
+        <v-btn @click="ready2 = true">Add Player</v-btn>
+        <v-progress-circular
+          v-if="!ready2"
+          size="90"
+          width="8"
+          indeterminate
+          color="red"
           ><div>Player 2</div></v-progress-circular
         >
-        <v-btn @click="ready2 = true">Add Player</v-btn>
       </div>
       <div>
-        <v-progress-circular size="90" width="8" indeterminate color="blue"
+        <v-btn @click="ready3 = true">Add Player</v-btn>
+        <v-progress-circular
+          v-if="!ready3"
+          size="90"
+          width="8"
+          indeterminate
+          color="blue"
           ><div>Player 3</div></v-progress-circular
         >
-        <v-btn @click="ready3 = true">Add Player</v-btn>
       </div>
       <div>
-        <v-progress-circular size="90" width="8" indeterminate color="red"
+        <v-btn @click="ready4 = true">Add Player</v-btn>
+        <v-progress-circular
+          v-if="!ready4"
+          size="90"
+          width="8"
+          indeterminate
+          color="red"
           ><div>Player 4</div></v-progress-circular
         >
-        <v-btn @click="ready4 = true">Add Player</v-btn>
       </div>
     </div>
   </v-container>
