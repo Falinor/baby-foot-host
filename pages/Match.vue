@@ -1,17 +1,23 @@
 <template>
   <v-container fluid class="container">
     <v-btn x-large to="/">Match End </v-btn>
-    <div></div>
-    <center>Team Batman</center>
-    <center>{{ Math.trunc(timerCount / 60) }}:{{ timerCount % 60 }}</center>
-    <center>Team Joker</center>
+    <div>
+      <center>Team Batman</center>
+      <center>{{ Math.trunc(timerCount / 60) }}:{{ timerCount % 60 }}</center>
+      <center>Team Joker</center>
+      <webcam-player />
+    </div>
   </v-container>
 </template>
 
 <script>
+import WebcamPlayer from '@/components/WebcamPlayer'
+
 export default {
+  components: { WebcamPlayer },
   data() {
     return {
+      audio: null,
       timerCount: 0,
       playlist: [
         './Qui ne saute pas.wav',
@@ -35,30 +41,35 @@ export default {
       immediate: true,
     },
   },
-
   mounted() {
     this.playAmbiance()
   },
-
+  destroyed() {
+    this.stopAmbiance()
+  },
   methods: {
     playAmbiance() {
       // <= use this function somewhere
-      const audio = new Audio()
+      this.audio = new Audio()
       const p = this.playlist
       let i = 0
-      audio.addEventListener(
+      this.audio.addEventListener(
         'ended',
         function () {
           i = ++i < p.length ? i : 0
-          audio.src = p[i]
-          audio.play()
+          this.audio.src = p[i]
+          this.audio.play()
         },
         true
       )
-      audio.volume = 0.3
-      audio.loop = false
-      audio.src = p[0]
-      audio.play()
+      this.audio.volume = 0.3
+      this.audio.loop = false
+      this.audio.src = p[0]
+      this.audio.play()
+    },
+    stopAmbiance() {
+      this.audio.pause()
+      delete this.audio
     },
   },
 }

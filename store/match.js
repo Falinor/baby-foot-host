@@ -1,7 +1,11 @@
 export const state = () => ({
-  match: null,
+  teams: [],
 })
 
 export const getters = {}
 
-export const mutations = {}
+export const mutations = {
+  setTeams(state, teams) {
+    state.teams = teams
+  },
+}

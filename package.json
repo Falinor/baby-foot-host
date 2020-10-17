@@ -22,10 +22,12 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.12.2",
     "@nuxtjs/pwa": "^3.0.2",
+    "axios": "^0.20.0",
     "core-js": "^3.6.5",
+    "lodash": "^4.17.20",
     "nuxt": "^2.14.6",
     "socket.io-client": "^2.3.1",
-    "vue-youtube": "^1.4.0",
+    "vue-web-cam": "^1.9.0",
     "vuex-persist": "^3.1.3"
   },
   "devDependencies": {
@@ -36,6 +38,7 @@
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.5.0",
+    "babel-plugin-lodash": "^3.3.4",
     "eslint": "^7.10.0",
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-nuxt": "^1.0.0",
