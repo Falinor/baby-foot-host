@@ -9,7 +9,7 @@ export const Events = {
 
 export class MatchService {
   constructor() {
-    this.socket = io(config.websocketServer)
+    this.socket = io(config.websocketServer, { reconnectionDelayMax: 1 })
     this.api = axios.create({
       baseURL: config.babyfootAPI,
     })
@@ -19,6 +19,4 @@ export class MatchService {
   onMatchUpdate(callback) {
     this.socket.on(Events.MATCH_UPDATE, callback)
   }
-
-  async create() {}
 }

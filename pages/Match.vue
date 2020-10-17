@@ -5,26 +5,31 @@
       <center>Team Batman</center>
       <center>{{ Math.trunc(timerCount / 60) }}:{{ timerCount % 60 }}</center>
       <center>Team Joker</center>
-      <webcam-player />
+      <v-btn @click="playGoal()">GOAL</v-btn>
     </div>
   </v-container>
 </template>
 
 <script>
-import WebcamPlayer from '@/components/WebcamPlayer'
+// import WebcamPlayer from '@/components/WebcamPlayer'
+import { randomElement } from '@/core'
 
 export default {
-  components: { WebcamPlayer },
+  // components: { WebcamPlayer },
   data() {
     return {
-      audio: null,
+      supporter: null,
+      ambiance: null,
+      goal: null,
       timerCount: 0,
-      playlist: [
+      ambianceList: [
         './Qui ne saute pas.wav',
         './Allezlaval.mp3',
         './Cantona.wav',
         './Strasbourgeois.mp3',
+        './Crowd.mp3',
       ],
+      goalList: ['./PAVARD.mp3', './Goal.mp3'],
     }
   },
 
@@ -45,31 +50,27 @@ export default {
     this.playAmbiance()
   },
   destroyed() {
+    this.stopGoal()
     this.stopAmbiance()
   },
   methods: {
+    playGoal() {
+      const i = randomElement(this.goalList)
+      this.goal = new Audio(i)
+      this.goal.volume = 1
+      this.goal.play()
+    },
+    stopGoal() {
+      this.goal.pause()
+    },
     playAmbiance() {
-      // <= use this function somewhere
-      this.audio = new Audio()
-      const p = this.playlist
-      let i = 0
-      this.audio.addEventListener(
-        'ended',
-        function () {
-          i = ++i < p.length ? i : 0
-          this.audio.src = p[i]
-          this.audio.play()
-        },
-        true
-      )
-      this.audio.volume = 0.3
-      this.audio.loop = false
-      this.audio.src = p[0]
-      this.audio.play()
+      const i = randomElement(this.ambianceList)
+      this.ambiance = new Audio(i)
+      this.ambiance.volume = 0.3
+      this.ambiance.play()
     },
     stopAmbiance() {
-      this.audio.pause()
-      delete this.audio
+      this.ambiance.pause()
     },
   },
 }
@@ -78,6 +79,6 @@ export default {
 <style scoped>
 .container {
   height: 100%;
-  background: center/cover no-repeat url('/test.jpg');
+  background: center/cover no-repeat url('/soccer-field-from-above.jpg');
 }
 </style>

@@ -5,7 +5,7 @@
       >Ready</v-btn
     >
     <div>
-      <dir>
+      <div>
         <v-btn @click="ready1 = true">Add Player</v-btn>
         <v-progress-circular
           v-if="!ready1"
@@ -15,7 +15,7 @@
           color="blue"
           ><div>Player 1</div></v-progress-circular
         >
-      </dir>
+      </div>
       <div>
         <v-btn @click="ready2 = true">Add Player</v-btn>
         <v-progress-circular

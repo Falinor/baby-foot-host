@@ -1,7 +1,7 @@
 <template>
   <v-row class="teams">
-    <v-col class="team" v-for="(team, i) of teams" :key="i" cols="6">
-      <span class="player" v-for="(player, j) of team" :key="j">
+    <v-col v-for="(team, i) of teams" :key="i" class="team" cols="6">
+      <span v-for="(player, j) of team" :key="j" class="player">
         {{ player }}
       </span>
     </v-col>
