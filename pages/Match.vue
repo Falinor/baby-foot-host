@@ -5,7 +5,6 @@
       <center>Team Batman</center>
       <center>{{ Math.trunc(timerCount / 60) }}:{{ timerCount % 60 }}</center>
       <center>Team Joker</center>
-      <v-btn @click="playGoal()">GOAL</v-btn>
     </div>
   </v-container>
 </template>
@@ -23,11 +22,15 @@ export default {
       goal: null,
       timerCount: 0,
       ambianceList: [
-        './Qui ne saute pas.wav',
-        './Allezlaval.mp3',
-        './Cantona.wav',
+        './Crowd1.mp3',
         './Strasbourgeois.mp3',
-        './Crowd.mp3',
+        './Crowd2.mp3',
+        './Qui ne saute pas.wav',
+        './Crowd3.mp3', // 2.27
+        './Allezlaval.mp3',
+        './Crowd4.mp3',
+        './Cantona.wav',
+        './Crowd5.mp3',
       ],
       goalList: ['./PAVARD.mp3', './Goal.mp3'],
     }
@@ -50,7 +53,11 @@ export default {
     this.playAmbiance()
   },
   destroyed() {
-    this.stopGoal()
+    try {
+      this.stopGoal()
+    } catch (err) {
+      console.error(err)
+    }
     this.stopAmbiance()
   },
   methods: {
@@ -64,9 +71,22 @@ export default {
       this.goal.pause()
     },
     playAmbiance() {
-      const i = randomElement(this.ambianceList)
-      this.ambiance = new Audio(i)
+      const playlist = this.ambianceList
+      let i = 0
+      this.ambiance = new Audio()
+      this.ambiance.addEventListener(
+        'ended',
+        () => {
+          // lambda function
+          i = ++i < playlist.length ? i : 0
+          this.ambiance.src = playlist[i]
+          this.ambiance.play()
+        },
+        true
+      )
       this.ambiance.volume = 0.3
+      this.ambiance.loop = false
+      this.ambiance.src = playlist[0]
       this.ambiance.play()
     },
     stopAmbiance() {
