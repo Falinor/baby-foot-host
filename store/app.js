@@ -5,7 +5,7 @@ import { rankedGameService } from '@/services'
 
 export function state() {
   return {
-    playOpening: true,
+    playOpening: false,
     status: Status.FREE,
     gameMode: null,
   }
@@ -30,7 +30,14 @@ export const mutations = {
 export const actions = {
   async fetchAttraction(store) {
     const { players, status } = await rankedGameService.getAttraction()
-    const teams = chunk(players, players.length / 2)
+    const teams = chunk(players, Math.ceil(players.length / 2)).map(
+      (players, i) => {
+        return {
+          players,
+          color: i === 0 ? 'black' : 'purple',
+        }
+      }
+    )
     store.commit('app/setStatus', status, { root: true })
     store.commit('match/setTeams', teams, { root: true })
   },

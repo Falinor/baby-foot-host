@@ -1,10 +1,12 @@
 <template>
   <v-container fluid class="container">
     <opening v-if="playOpening" />
-    <div class="modes">
-      <v-btn to="/ranked" x-large text>Ranked game</v-btn>
-      <v-btn to="/quickplay" x-large text>Quickplay</v-btn>
-    </div>
+    <template v-else>
+      <div class="modes">
+        <v-btn to="/ranked" x-large text>Ranked game</v-btn>
+        <v-btn to="/quickplay" x-large text>Quickplay</v-btn>
+      </div>
+    </template>
   </v-container>
 </template>
 

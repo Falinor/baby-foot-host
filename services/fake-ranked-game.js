@@ -6,8 +6,8 @@ export class FakeRankedGameService {
       players: [
         'Jean-Renaud de la Fougère',
         'Melville de la Villardière',
-        'Maicépapossible',
-        'Inprénomossilon',
+        // 'Maicépapossible',
+        // 'Inprénomossilon',
       ],
       status: Status.FREE,
     }
