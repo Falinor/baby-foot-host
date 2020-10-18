@@ -12,9 +12,10 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 // import WebcamPlayer from '@/components/WebcamPlayer'
 import { matchService } from '@/services'
-import { mapGetters } from 'vuex'
 import { randomElement } from '@/core'
 
 export default {

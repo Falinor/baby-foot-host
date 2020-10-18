@@ -2,13 +2,13 @@
   <div>
     <v-sheet class="score mx-auto" light elevation="16" width="400" height="70">
       <div class="team">
-        <h5 class="name">{{ batmen.name }}</h5>
-        <h2 class="points">{{ batmen.points }}</h2>
+        <h5 class="name text-h5">{{ batmen.name }}</h5>
+        <h2 class="points text-h2">{{ batmen.points }}</h2>
       </div>
       <v-divider vertical />
       <div class="team">
-        <h2 class="points">{{ jokers.points }}</h2>
-        <h5 class="name">{{ jokers.name }}</h5>
+        <h2 class="points text-h2">{{ jokers.points }}</h2>
+        <h5 class="name text-h5">{{ jokers.name }}</h5>
       </div>
     </v-sheet>
     <v-sheet class="timer mx-auto" elevation="16" width="100" height="40">
@@ -73,12 +73,10 @@ export default {
 
 .points {
   display: inline;
-  font-size: 2.4rem;
 }
 
 .name {
   display: inline;
-  font-size: 1.8rem;
   padding: 0 1rem;
 }
 
