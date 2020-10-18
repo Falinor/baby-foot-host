@@ -5,12 +5,16 @@
       <center>Team Batman</center>
       <center>{{ Math.trunc(timerCount / 60) }}:{{ timerCount % 60 }}</center>
       <center>Team Joker</center>
+      <score :teams="teams" />
+      <v-btn @click="playGoal()">GOAL</v-btn>
     </div>
   </v-container>
 </template>
 
 <script>
 // import WebcamPlayer from '@/components/WebcamPlayer'
+import { matchService } from '@/services'
+import { mapGetters } from 'vuex'
 import { randomElement } from '@/core'
 
 export default {
@@ -35,7 +39,7 @@ export default {
       goalList: ['./PAVARD.mp3', './Goal.mp3'],
     }
   },
-
+  computed: mapGetters('match', ['teams']),
   watch: {
     timerCount: {
       handler(value) {
@@ -51,6 +55,11 @@ export default {
   },
   mounted() {
     this.playAmbiance()
+    matchService.onMatchUpdate((team) => {
+      console.log(`The team ${team} scored a goal!`)
+      this.$store.commit('match/incrementTeamPoints', team)
+      this.playGoal()
+    })
   },
   destroyed() {
     try {

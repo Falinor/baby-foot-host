@@ -7,25 +7,22 @@
       </v-btn>
       <h2 class="title">Creating Ranked Game</h2>
     </v-row>
-    <v-row class="players">
-      <v-col>
-        <v-progress-circular indeterminate color="blue"></v-progress-circular>
-        <v-progress-circular indeterminate color="blue"></v-progress-circular>
-        <v-progress-circular indeterminate color="red"> </v-progress-circular>
-        <v-progress-circular indeterminate color="red"> </v-progress-circular>
-      </v-col>
+    <v-row justify="center" align="center">
+      <teams :teams="teams" />
     </v-row>
   </v-container>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
+
+import Teams from '@/components/Teams.vue'
 
 export default {
-  data: () => ({
-    teams: [],
-    status: null,
-  }),
+  components: {
+    Teams,
+  },
+  computed: mapGetters('match', ['teams']),
   async created() {
     await this.fetchAttraction()
   },
@@ -44,8 +41,5 @@ export default {
 
 .title {
   padding: 0 2rem;
-}
-
-.players {
 }
 </style>
