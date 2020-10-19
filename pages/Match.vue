@@ -13,13 +13,10 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
-// import WebcamPlayer from '@/components/WebcamPlayer'
 import { matchService } from '@/services'
 import { randomElement } from '@/core'
 
 export default {
-  // components: { WebcamPlayer },
   data() {
     return {
       supporter: null,
@@ -57,7 +54,7 @@ export default {
   mounted() {
     this.playAmbiance()
     matchService.onMatchUpdate((team) => {
-      console.log(`The team ${team} scored a goal!`)
+      // console.log(`The team ${team} scored a goal!`)
       this.$store.commit('match/incrementTeamPoints', team)
       this.playGoal()
     })
@@ -87,7 +84,6 @@ export default {
       this.ambiance.addEventListener(
         'ended',
         () => {
-          // lambda function
           i = ++i < playlist.length ? i : 0
           this.ambiance.src = playlist[i]
           this.ambiance.play()

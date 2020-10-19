@@ -1,6 +1,9 @@
 <template>
   <v-container fluid class="container">
-    <v-btn x-large to="/"> Retour </v-btn>
+    <v-btn to="/" text>
+      <v-icon left dark>mdi-arrow-left-bold</v-icon>
+      Back
+    </v-btn>
     <v-btn v-if="ready1 & ready2 & ready3 & ready4" x-large to="/Match"
       >Ready</v-btn
     >
