@@ -12,7 +12,7 @@
       </div>
     </v-sheet>
     <v-sheet class="timer mx-auto" elevation="16" width="100" height="40">
-      {{ timer }}
+      <center>{{ timer }}</center>
     </v-sheet>
   </div>
 </template>
@@ -69,6 +69,9 @@ export default {
 
 .team {
   padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  flex: auto;
 }
 
 .points {
@@ -82,7 +85,8 @@ export default {
 
 .timer {
   position: fixed;
-  top: 70px;
+  top: 80px;
   left: calc(50% - 50px);
+  font-size: x-large;
 }
 </style>

@@ -2,12 +2,29 @@
   <v-container fluid class="container">
     <v-btn x-large to="/">Match End </v-btn>
     <div>
-      <center>Team Batman</center>
-      <center>{{ Math.trunc(timerCount / 60) }}:{{ timerCount % 60 }}</center>
-      <center>Team Joker</center>
-      <score :teams="teams" />
-      <v-btn @click="playGoal()">GOAL</v-btn>
+      <score :teams="teams"></score>
     </div>
+    <v-dialog v-model="win" persistent fullscreen
+      ><v-card
+        ><v-card-text><center>WE HAVE A WINNER</center></v-card-text></v-card
+      ></v-dialog
+    >
+    <v-dialog v-model="dialog" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline">Valider le dernier but ? </v-card-title>
+        <v-card-text
+          ><center>
+            {{ teams[0].name }} {{ teams[0].points }} - {{ teams[1].points }}
+            {{ teams[1].name }}
+          </center></v-card-text
+        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="yellow darken-1" @click="gameWinner()"> Oui </v-btn>
+          <v-btn color="yellow darken-1" @click="fakeGoal()"> Non </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -19,6 +36,9 @@ import { randomElement } from '@/core'
 export default {
   data() {
     return {
+      win: false,
+      winner: null,
+      dialog: true,
       supporter: null,
       ambiance: null,
       goal: null,
@@ -31,7 +51,7 @@ export default {
         './Crowd3.mp3', // 2.27
         './Allezlaval.mp3',
         './Crowd4.mp3',
-        './Cantona.wav',
+        './Cantona.wav', // 4.32
         './Crowd5.mp3',
       ],
       goalList: ['./PAVARD.mp3', './Goal.mp3'],
@@ -57,6 +77,10 @@ export default {
       // console.log(`The team ${team} scored a goal!`)
       this.$store.commit('match/incrementTeamPoints', team)
       this.playGoal()
+      if (team.score === 10) {
+        this.winner = team
+        this.dialog = true
+      }
     })
   },
   destroyed() {
@@ -90,13 +114,23 @@ export default {
         },
         true
       )
-      this.ambiance.volume = 0.3
+      this.ambiance.volume = 0.4
       this.ambiance.loop = false
       this.ambiance.src = playlist[0]
       this.ambiance.play()
     },
     stopAmbiance() {
       this.ambiance.pause()
+    },
+    gameWinner() {
+      this.win = true
+      setTimeout(() => {
+        this.$router.replace('/')
+      }, 3000)
+    },
+    fakeGoal() {
+      this.dialog = false
+      this.winner.points = 9
     },
   },
 }
