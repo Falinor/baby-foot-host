@@ -9,9 +9,8 @@ export class RankedGameService {
     })
   }
 
-  getAttraction() {
-    return this.http
-      .get('/attractions/babyfoot')
-      .then((res) => res.data.attraction)
+  async getAttraction() {
+    const { data } = await this.http.get('/attractions/babyfoot')
+    return data.attraction
   }
 }

@@ -12,12 +12,12 @@
     <v-dialog v-model="dialog" persistent max-width="290">
       <v-card>
         <v-card-title class="headline">Valider le dernier but ? </v-card-title>
-        <v-card-text
-          ><center>
+        <v-card-text>
+          <center>
             {{ teams[0].name }} {{ teams[0].points }} - {{ teams[1].points }}
             {{ teams[1].name }}
-          </center></v-card-text
-        >
+          </center>
+        </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="yellow darken-1" @click="gameWinner()"> Oui </v-btn>
@@ -30,8 +30,9 @@
 
 <script>
 import { mapGetters } from 'vuex'
+
+import { config, randomElement } from '@/core'
 import { matchService } from '@/services'
-import { randomElement } from '@/core'
 
 export default {
   data() {
@@ -42,7 +43,6 @@ export default {
       supporter: null,
       ambiance: null,
       goal: null,
-      timerCount: 0,
       ambianceList: [
         './Crowd1.mp3',
         './Strasbourgeois.mp3',
@@ -71,26 +71,19 @@ export default {
   },
   computed: mapGetters('match', ['teams']),
   watch: {
-    timerCount: {
-      handler(value) {
-        if (value < 1800) {
-          // 30min
-          setTimeout(() => {
-            this.timerCount++
-          }, 1000)
-        }
-      },
-      immediate: true,
+    teams() {
+      this.dialog = this.teams.some((team) => team.points === config.maxPoints)
     },
   },
   mounted() {
     this.playAmbiance()
-    matchService.onMatchUpdate((team) => {
+    matchService.onMatchUpdate((teamName) => {
       // console.log(`The team ${team} scored a goal!`)
-      this.$store.commit('match/incrementTeamPoints', team)
+      const scoringTeam = this.teams.find((team) => team.name !== teamName)
+      this.$store.commit('match/incrementTeamPoints', scoringTeam)
       this.playGoal()
-      if (team.points === 10) {
-        this.winner = team
+      if (scoringTeam.points === 10) {
+        this.winner = scoringTeam
         this.dialog = true
       }
     })

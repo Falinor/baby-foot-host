@@ -1,11 +1,17 @@
 <template>
-  <v-container fluid class="container">
+  <v-container fluid class="index-container">
     <opening v-if="playOpening" />
     <template v-else>
-      <div class="modes">
-        <v-btn to="/ranked" x-large text>Ranked game</v-btn>
-        <v-btn to="/quickplay" x-large text>Quickplay</v-btn>
-      </div>
+      <v-row>
+        <v-col class="modes" cols="8">
+          <v-btn to="/ranked" x-large text>Ranked game</v-btn>
+          <v-btn to="/quickplay" x-large text>Quickplay</v-btn>
+        </v-col>
+        <v-col class="leaderboards" cols="4">
+          <team-leaderboard class="leaderboard" />
+          <player-leaderboard class="leaderboard" />
+        </v-col>
+      </v-row>
     </template>
   </v-container>
 </template>
@@ -14,6 +20,8 @@
 import { mapGetters } from 'vuex'
 
 import Opening from '@/components/Opening.vue'
+import PlayerLeaderboard from '@/components/PlayerLeaderboard.vue'
+import TeamLeaderboard from '@/components/TeamLeaderboard.vue'
 
 export default {
   data() {
@@ -22,6 +30,8 @@ export default {
     }
   },
   components: {
+    TeamLeaderboard,
+    PlayerLeaderboard,
     Opening,
   },
   computed: {
@@ -46,7 +56,7 @@ export default {
 </script>
 
 <style scoped>
-.container {
+.index-container {
   height: 100%;
   background: center/cover no-repeat url('/test.jpg');
 }
@@ -63,5 +73,9 @@ export default {
 
 .modes > * {
   margin: 1rem 0;
+}
+
+.leaderboard {
+  margin: 8px;
 }
 </style>

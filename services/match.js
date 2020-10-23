@@ -1,4 +1,3 @@
-import axios from 'axios'
 import io from 'socket.io-client'
 
 import { config } from '@/core'
@@ -9,9 +8,9 @@ export const Events = {
 
 export class MatchService {
   constructor() {
-    this.socket = io(config.websocketServer, { reconnectionDelayMax: 1 })
-    this.api = axios.create({
-      baseURL: config.babyfootAPI,
+    this.socket = io(config.websocketServer, {
+      // TODO: find how to time out
+      reconnectionAttempts: 3,
     })
     console.info(`Socket connected ${this.socket.id}`)
   }
