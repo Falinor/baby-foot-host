@@ -46,11 +46,13 @@ export default {
   methods: {
     minusPoints(team) {
       // team.points -= 1
-      this.$store.commit('match/decrementTeamPoints', team)
+      if (team.points >= 0)
+        this.$store.commit('match/decrementTeamPoints', team)
     },
     plusPoints(team) {
       // team.points++
-      this.$store.commit('match/incrementTeamPoints', team)
+      if (team.points <= 9)
+        this.$store.commit('match/incrementTeamPoints', team)
     },
   },
   watch: {

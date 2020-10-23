@@ -16,11 +16,31 @@ import { mapGetters } from 'vuex'
 import Opening from '@/components/Opening.vue'
 
 export default {
+  data() {
+    return {
+      ambiance: null,
+    }
+  },
   components: {
     Opening,
   },
   computed: {
     ...mapGetters('app', ['playOpening']),
+  },
+  mounted() {
+    this.playTheme()
+  },
+  methods: {
+    playTheme() {
+      this.ambiance = new Audio('./Menu Theme.mp3')
+      this.ambiance.play()
+    },
+    stopTheme() {
+      this.ambiance.pause()
+    },
+  },
+  destroyed() {
+    this.stopTheme()
   },
 }
 </script>

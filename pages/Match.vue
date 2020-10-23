@@ -54,7 +54,19 @@ export default {
         './Cantona.wav', // 4.32
         './Crowd5.mp3',
       ],
-      goalList: ['./PAVARD.mp3', './Goal.mp3'],
+      goalList: [
+        './PAVARD.mp3',
+        './Goal.mp3',
+        './Goal1.mp3',
+        './Goal2.mp3',
+        './Goal3.mp3',
+        './Goal4.mp3',
+        './Goal5.mp3',
+        './Goal6.mp3',
+        './Goal7.mp3',
+        './Goal8.mp3',
+        './Goal9.mp3',
+      ],
     }
   },
   computed: mapGetters('match', ['teams']),
@@ -77,7 +89,7 @@ export default {
       // console.log(`The team ${team} scored a goal!`)
       this.$store.commit('match/incrementTeamPoints', team)
       this.playGoal()
-      if (team.score === 10) {
+      if (team.points === 10) {
         this.winner = team
         this.dialog = true
       }
@@ -116,7 +128,7 @@ export default {
       )
       this.ambiance.volume = 0.4
       this.ambiance.loop = false
-      this.ambiance.src = playlist[0]
+      this.ambiance.src = './Final.mp3'
       this.ambiance.play()
     },
     stopAmbiance() {
@@ -124,9 +136,13 @@ export default {
     },
     gameWinner() {
       this.win = true
+      this.ambiance.pause()
+      this.goal.src = './Final.mp3' // this is disgusting
+      this.goal.play()
+
       setTimeout(() => {
         this.$router.replace('/')
-      }, 3000)
+      }, 5000)
     },
     fakeGoal() {
       this.dialog = false
