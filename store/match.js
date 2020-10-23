@@ -20,4 +20,11 @@ export const mutations = {
       team.points++
     }
   },
+
+  decrementTeamPoints(state, name) {
+    const team = state.teams.find((t) => t.name === name)
+    if (team) {
+      team.points -= 1
+    }
+  },
 }

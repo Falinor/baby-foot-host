@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="container">
-    <v-btn x-large to="/">Match End </v-btn>
+    <v-btn x-large @click="dialog = true">Match End </v-btn>
     <div>
       <score :teams="teams"></score>
     </div>
@@ -38,7 +38,7 @@ export default {
     return {
       win: false,
       winner: null,
-      dialog: true,
+      dialog: false,
       supporter: null,
       ambiance: null,
       goal: null,
