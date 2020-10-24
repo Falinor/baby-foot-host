@@ -5,7 +5,7 @@
       <v-row>
         <v-col class="modes" cols="8">
           <v-btn to="/ranked" x-large text>Ranked game</v-btn>
-          <v-btn to="/quickplay" x-large text>Quickplay</v-btn>
+          <v-btn to="/match" x-large text>Quickplay</v-btn>
         </v-col>
         <v-col class="leaderboards" cols="4">
           <team-leaderboard class="leaderboard" />
@@ -24,21 +24,24 @@ import PlayerLeaderboard from '@/components/PlayerLeaderboard.vue'
 import TeamLeaderboard from '@/components/TeamLeaderboard.vue'
 
 export default {
-  data() {
-    return {
-      ambiance: null,
-    }
-  },
   components: {
     TeamLeaderboard,
     PlayerLeaderboard,
     Opening,
+  },
+  data() {
+    return {
+      ambiance: null,
+    }
   },
   computed: {
     ...mapGetters('app', ['playOpening']),
   },
   mounted() {
     this.playTheme()
+  },
+  destroyed() {
+    this.stopTheme()
   },
   methods: {
     playTheme() {
@@ -48,9 +51,6 @@ export default {
     stopTheme() {
       this.ambiance.pause()
     },
-  },
-  destroyed() {
-    this.stopTheme()
   },
 }
 </script>

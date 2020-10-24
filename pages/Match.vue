@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="container">
-    <v-btn x-large @click="dialog = true">Match End </v-btn>
+    <v-btn x-large to="/">Cancel Match</v-btn>
     <div>
       <score :teams="teams"></score>
     </div>
@@ -29,8 +29,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-
 import { config, randomElement } from '@/core'
 import { matchService } from '@/services'
 
@@ -39,11 +37,10 @@ export default {
     return {
       win: false,
       winner: null,
-      dialog: false,
       supporter: null,
       ambiance: null,
-      goal: null,
       ambianceList: [
+        './PSG.mp3',
         './Crowd1.mp3',
         './Strasbourgeois.mp3',
         './Crowd2.mp3',
@@ -53,6 +50,8 @@ export default {
         './Crowd4.mp3',
         './Cantona.wav', // 4.32
         './Crowd5.mp3',
+        './Diabos.mp3',
+        './Crowd4.mp3',
       ],
       goalList: [
         './PAVARD.mp3',
@@ -69,18 +68,28 @@ export default {
       ],
     }
   },
-  computed: mapGetters('match', ['teams']),
-  watch: {
+  computed: {
     teams() {
-      this.dialog = this.teams.some((team) => team.points === config.maxPoints)
+      return this.$store.getters['match/teams']
+    },
+    score() {
+      return (name) => this.$store.getters['match/score'](name)
+    },
+    dialog() {
+      return this.teams.some((team) => team.points === config.maxPoints)
+    },
+  },
+  watch: {
+    score(newScore) {
+      this.dialog = newScore === config.maxPoints
     },
   },
   mounted() {
+    console.log(this.teams[0].points)
     this.playAmbiance()
     matchService.onMatchUpdate((teamName) => {
-      // console.log(`The team ${team} scored a goal!`)
       const scoringTeam = this.teams.find((team) => team.name !== teamName)
-      this.$store.commit('match/incrementTeamPoints', scoringTeam)
+      this.$store.commit('match/incrementTeamPoints', scoringTeam.name)
       this.playGoal()
       if (scoringTeam.points === 10) {
         this.winner = scoringTeam
@@ -95,13 +104,14 @@ export default {
       console.error(err)
     }
     this.stopAmbiance()
+    this.$store.commit('match/resetMatch')
   },
   methods: {
     playGoal() {
       const i = randomElement(this.goalList)
-      this.goal = new Audio(i)
-      this.goal.volume = 1
-      this.goal.play()
+      const goal = new Audio(i)
+      goal.volume = 1
+      goal.play()
     },
     stopGoal() {
       this.goal.pause()
@@ -113,7 +123,7 @@ export default {
       this.ambiance.addEventListener(
         'ended',
         () => {
-          i = ++i < playlist.length ? i : 0
+          i = i++ < playlist.length ? i : 0
           this.ambiance.src = playlist[i]
           this.ambiance.play()
         },
@@ -121,7 +131,7 @@ export default {
       )
       this.ambiance.volume = 0.4
       this.ambiance.loop = false
-      this.ambiance.src = './Final.mp3'
+      this.ambiance.src = './start.mp3'
       this.ambiance.play()
     },
     stopAmbiance() {
@@ -130,9 +140,9 @@ export default {
     gameWinner() {
       this.win = true
       this.ambiance.pause()
-      this.goal.src = './Final.mp3' // this is disgusting
-      this.goal.play()
-
+      const a = new Audio('./Final.mp3')
+      a.volume = 1
+      a.play()
       setTimeout(() => {
         this.$router.replace('/')
       }, 5000)

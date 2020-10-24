@@ -1,9 +1,13 @@
-export const state = () => ({
-  teams: [
-    { color: 'black', name: 'batman', players: [], points: 0 },
-    { color: 'purple', name: 'joker', players: [], points: 0 },
-  ],
-})
+export const getInitialState = () => {
+  return {
+    teams: [
+      { color: 'black', name: 'batman', players: [], points: 0 },
+      { color: 'purple', name: 'joker', players: [], points: 0 },
+    ],
+  }
+}
+
+export const state = () => getInitialState()
 
 export const getters = {
   teams: (state) => state.teams,
@@ -19,6 +23,10 @@ export const mutations = {
     if (team) {
       team.points++
     }
+  },
+  resetMatch(oldstate) {
+    console.log('POUET')
+    Object.assign(oldstate, getInitialState())
   },
 
   decrementTeamPoints(state, name) {

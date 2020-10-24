@@ -3,15 +3,15 @@
     <v-sheet class="score mx-auto" light elevation="16" width="400" height="70">
       <div class="team">
         <h5 class="name text-h5">{{ batmen.name }}</h5>
-        <v-icon @click="plusPoints(batmen.name)">mdi-plus</v-icon>
-        <v-icon @click="minusPoints(batmen.name)">mdi-minus</v-icon>
+        <v-icon @click="plusPoints(batmen)">mdi-plus</v-icon>
+        <v-icon @click="minusPoints(batmen)">mdi-minus</v-icon>
         <h2 class="points text-h2">{{ batmen.points }}</h2>
       </div>
       <v-divider vertical />
       <div class="team">
         <h2 class="points text-h2">{{ jokers.points }}</h2>
-        <v-icon @click="plusPoints(jokers.name)">mdi-plus</v-icon>
-        <v-icon @click="minusPoints(jokers.name)">mdi-minus</v-icon>
+        <v-icon @click="plusPoints(jokers)">mdi-plus</v-icon>
+        <v-icon @click="minusPoints(jokers)">mdi-minus</v-icon>
         <h5 class="name text-h5">{{ jokers.name }}</h5>
       </div>
     </v-sheet>
@@ -43,18 +43,6 @@ export default {
       return `${Math.trunc(this.timerCount / 60)}:${this.timerCount % 60}`
     },
   },
-  methods: {
-    minusPoints(team) {
-      // team.points -= 1
-      if (team.points >= 0)
-        this.$store.commit('match/decrementTeamPoints', team)
-    },
-    plusPoints(team) {
-      // team.points++
-      if (team.points <= 9)
-        this.$store.commit('match/incrementTeamPoints', team)
-    },
-  },
   watch: {
     timerCount: {
       handler(value) {
@@ -66,6 +54,16 @@ export default {
         }
       },
       immediate: true,
+    },
+  },
+  methods: {
+    minusPoints(team) {
+      if (team.points >= 1)
+        this.$store.commit('match/decrementTeamPoints', team.name)
+    },
+    plusPoints(team) {
+      if (team.points <= 9)
+        this.$store.commit('match/incrementTeamPoints', team.name)
     },
   },
 }
