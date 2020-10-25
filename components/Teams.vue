@@ -1,16 +1,22 @@
 <template>
-  <v-card light>
-    <v-card-text>
-      <v-row v-for="(team, i) of filledTeams" :key="i">
-        <v-col v-for="(player, j) of team.players" :key="j" class="player">
+  <v-card light min-width="600">
+    <v-card-text class="teams">
+      <v-col v-for="(team, i) of filledTeams" :key="i" cols="4">
+        <div v-for="(player, j) of team.players" :key="j" class="player">
           <span :style="{ color: team.color }">
-            <template v-if="player">{{ player }}</template>
+            <template v-if="player">{{ player.nickname }}</template>
             <template v-else>Waiting for player...</template>
           </span>
           <v-progress-linear v-if="!player" indeterminate :color="team.color" />
-        </v-col>
-      </v-row>
+        </div>
+      </v-col>
     </v-card-text>
+    <v-card-actions class="actions">
+      <v-btn x-large text color="accent" to="/match" :disabled="!canStart">
+        Start
+        <v-icon large right>mdi-soccer</v-icon>
+      </v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -23,6 +29,9 @@ export default {
     },
   },
   computed: {
+    canStart() {
+      return this.teams.every((team) => team.players.length === 2)
+    },
     filledTeams() {
       return this.teams.map((team) => ({
         ...team,
@@ -34,4 +43,18 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.teams {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-between;
+}
+
+.player {
+  padding: 1rem 0;
+}
+
+.actions {
+  justify-content: center;
+}
+</style>
