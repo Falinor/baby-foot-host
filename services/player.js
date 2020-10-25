@@ -13,4 +13,9 @@ export class PlayerService {
     const { data: players } = await this.http.get('/players')
     return players
   }
+
+  async get(id) {
+    const { data: player } = await this.http.get(`/players/${id}`)
+    return player
+  }
 }

@@ -11,7 +11,7 @@
     >
     <v-dialog v-model="dialog" persistent max-width="290">
       <v-card>
-        <v-card-title class="headline">Valider le dernier but ? </v-card-title>
+        <v-card-title class="headline">Valider le dernier but ?</v-card-title>
         <v-card-text>
           <center>
             {{ teams[0].name }} {{ teams[0].points }} - {{ teams[1].points }}
@@ -37,6 +37,7 @@ export default {
     return {
       win: false,
       winner: null,
+      goal: null,
       supporter: null,
       ambiance: null,
       ambianceList: [
@@ -85,7 +86,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.teams[0].points)
     this.playAmbiance()
     matchService.onMatchUpdate((teamName) => {
       const scoringTeam = this.teams.find((team) => team.name !== teamName)
@@ -109,9 +109,9 @@ export default {
   methods: {
     playGoal() {
       const i = randomElement(this.goalList)
-      const goal = new Audio(i)
-      goal.volume = 1
-      goal.play()
+      this.goal = new Audio(i)
+      this.goal.volume = 1
+      this.goal.play()
     },
     stopGoal() {
       this.goal.pause()

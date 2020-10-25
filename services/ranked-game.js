@@ -1,6 +1,7 @@
 import axios from 'axios'
 
 import { config } from '@/core'
+import { playerService } from '@/services/index'
 
 export class RankedGameService {
   constructor() {
@@ -11,6 +12,10 @@ export class RankedGameService {
 
   async getAttraction() {
     const { data } = await this.http.get('/attractions/babyfoot')
-    return data.attraction
+    const { attraction } = data
+    const players = await Promise.all(
+      attraction.players.map((playerId) => playerService.get(playerId))
+    )
+    return { ...attraction, players }
   }
 }

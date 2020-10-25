@@ -22,12 +22,18 @@ export default {
   components: {
     Teams,
   },
+  data: () => ({
+    interval: null,
+  }),
   computed: mapGetters('match', ['teams']),
   async created() {
     await this.fetchAttraction()
   },
   mounted() {
-    setInterval(this.fetchAttraction, 5000)
+    this.interval = setInterval(this.fetchAttraction, 5000)
+  },
+  destroyed() {
+    clearInterval(this.interval)
   },
   methods: mapActions('app', ['fetchAttraction']),
 }
