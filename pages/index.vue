@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     playTheme() {
-      this.ambiance = new Audio('./Menu Theme.mp3')
+      this.ambiance = new Audio('./sounds/Menu Theme.mp3')
       this.ambiance.play()
     },
     stopTheme() {

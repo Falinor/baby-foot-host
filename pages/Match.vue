@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { config, randomElement } from '@/core'
+import { config } from '@/core'
 import { matchService } from '@/services'
 
 export default {
@@ -135,7 +135,7 @@ export default {
       )
       this.ambiance.volume = 0.4
       this.ambiance.loop = false
-      this.ambiance.src = './start.mp3'
+      this.ambiance.src = './sounds/start.mp3'
       this.ambiance.play()
     },
     stopAmbiance() {
@@ -144,7 +144,7 @@ export default {
     gameWinner() {
       this.win = true
       this.ambiance.pause()
-      const a = new Audio('./Final.mp3')
+      const a = new Audio('./sounds/Final.mp3')
       a.volume = 1
       a.play()
       setTimeout(() => {
