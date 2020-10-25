@@ -10,6 +10,9 @@
     <v-row justify="center" align="center">
       <teams :teams="teams" />
     </v-row>
+    <v-row justify="center" align="center"
+      ><v-btn v-if="ready" to="match">Lancer la partie</v-btn></v-row
+    >
   </v-container>
 </template>
 
@@ -21,6 +24,11 @@ import Teams from '@/components/Teams.vue'
 export default {
   components: {
     Teams,
+  },
+  data() {
+    return {
+      ready: true,
+    }
   },
   computed: mapGetters('match', ['teams']),
   async created() {

@@ -35,36 +35,38 @@ import { matchService } from '@/services'
 export default {
   data() {
     return {
+      goalNb: 0,
       win: false,
       winner: null,
       supporter: null,
       ambiance: null,
       ambianceList: [
-        './PSG.mp3',
-        './Crowd1.mp3',
-        './Strasbourgeois.mp3',
-        './Crowd2.mp3',
-        './Qui ne saute pas.wav',
-        './Crowd3.mp3', // 2.27
-        './Allezlaval.mp3',
-        './Crowd4.mp3',
-        './Cantona.wav', // 4.32
-        './Crowd5.mp3',
-        './Diabos.mp3',
-        './Crowd4.mp3',
+        './sounds/PSG.mp3',
+        './sounds/Crowd1.mp3',
+        './sounds/Strasbourgeois.mp3',
+        './sounds/Crowd2.mp3',
+        './sounds/Qui ne saute pas.wav',
+        './sounds/Crowd3.mp3', // 2.27
+        './sounds/Allezlaval.mp3',
+        './sounds/Crowd4.mp3',
+        './sounds/Cantona.wav', // 4.32
+        './sounds/Crowd5.mp3',
+        './sounds/Diabos.mp3',
+        './sounds/Crowd4.mp3',
       ],
       goalList: [
-        './PAVARD.mp3',
-        './Goal.mp3',
-        './Goal1.mp3',
-        './Goal2.mp3',
-        './Goal3.mp3',
-        './Goal4.mp3',
-        './Goal5.mp3',
-        './Goal6.mp3',
-        './Goal7.mp3',
-        './Goal8.mp3',
-        './Goal9.mp3',
+        './sounds/PAVARD.mp3',
+        './sounds/Goal.mp3',
+        './sounds/Goal1.mp3',
+        './sounds/Goal2.mp3',
+        './sounds/Goal3.mp3',
+        './sounds/Goal4.mp3',
+        './sounds/Goal5.mp3',
+        './sounds/Goal6.mp3',
+        './sounds/Goal7.mp3',
+        './sounds/Goal8.mp3',
+        './sounds/Goal9.mp3',
+        './sounds/Goal10.mp3',
       ],
     }
   },
@@ -108,10 +110,12 @@ export default {
   },
   methods: {
     playGoal() {
-      const i = randomElement(this.goalList)
+      const i = this.goalList[this.goalNb]
       const goal = new Audio(i)
       goal.volume = 1
       goal.play()
+      if (this.goalNb === this.goalList.length - 1) this.goalNb = 0
+      else this.goalNb++
     },
     stopGoal() {
       this.goal.pause()
@@ -146,10 +150,6 @@ export default {
       setTimeout(() => {
         this.$router.replace('/')
       }, 5000)
-    },
-    fakeGoal() {
-      this.dialog = false
-      this.winner.points = 9
     },
   },
 }
