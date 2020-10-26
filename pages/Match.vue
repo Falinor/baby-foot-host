@@ -35,8 +35,8 @@
 
 <script>
 import Notification from '@/components/Notification'
-import { config } from '@/core'
-import { matchService, recorderService } from '@/services'
+import { config, GameMode } from '@/core'
+import { matchService, rankedGameService, recorderService } from '@/services'
 
 export default {
   components: { Notification },
@@ -102,6 +102,9 @@ export default {
       this.notification.text = 'Recording unavailable'
       this.notification.show = true
     }
+    if (this.match.mode === GameMode.RANKED) {
+      await rankedGameService.startAttraction()
+    }
   },
   mounted() {
     this.playAmbiance()
@@ -120,7 +123,7 @@ export default {
     recorderService.disconnect()
     this.stopGoal()
     this.stopAmbiance()
-    this.$store.commit('match/resetMatch')
+    this.$store.commit('match/endMatch')
   },
   methods: {
     playGoal() {

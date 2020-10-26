@@ -17,6 +17,7 @@
 import { mapActions, mapGetters } from 'vuex'
 
 import Teams from '@/components/Teams.vue'
+import { GameMode } from '@/core'
 
 export default {
   components: {
@@ -27,6 +28,7 @@ export default {
   }),
   computed: mapGetters('match', ['teams']),
   async created() {
+    this.$store.commit('match/setGameMode', GameMode.RANKED)
     await this.fetchAttraction()
   },
   mounted() {

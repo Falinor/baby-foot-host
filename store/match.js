@@ -1,7 +1,9 @@
+import { GameMode } from '@/core'
 import { matchService } from '@/services'
 
 export const getInitialState = () => {
   return {
+    mode: GameMode.QUICKPLAY,
     teams: [
       { color: 'black', name: 'batman', players: [], points: 0 },
       { color: 'purple', name: 'joker', players: [], points: 0 },
@@ -17,6 +19,9 @@ export const getters = {
 }
 
 export const mutations = {
+  setGameMode(state, mode) {
+    state.mode = mode
+  },
   setTeams(state, teams) {
     state.teams = teams
   },
@@ -35,15 +40,10 @@ export const mutations = {
   endMatch(state) {
     state = { ...getInitialState() }
   },
-  resetMatch(oldstate) {
-    console.log('POUET')
-    Object.assign(oldstate, getInitialState())
-  },
 }
 
 export const actions = {
   async endMatch(store) {
-    console.log(store.state)
     await matchService.create(store.state)
     store.commit('match/endMatch')
   },

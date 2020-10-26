@@ -11,6 +11,11 @@ export class TeamService {
 
   async find(options = {}) {
     const { data: teams } = await this.http.get('/teams')
-    return teams
+    return teams.map(fromAPI)
   }
 }
+
+const fromAPI = (team) => ({
+  ...team,
+  nickname: team.players.map((player) => player.nickname).join(' - '),
+})

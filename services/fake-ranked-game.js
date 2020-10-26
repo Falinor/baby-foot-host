@@ -13,5 +13,7 @@ export class FakeRankedGameService {
     }
   }
 
-  startAttraction() {}
+  startAttraction() {
+    console.log('Attraction started')
+  }
 }
