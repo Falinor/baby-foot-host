@@ -1,3 +1,5 @@
+import { matchService } from '@/services'
+
 export const getInitialState = () => {
   return {
     teams: [
@@ -24,15 +26,25 @@ export const mutations = {
       team.points++
     }
   },
-  resetMatch(oldstate) {
-    console.log('POUET')
-    Object.assign(oldstate, getInitialState())
-  },
-
   decrementTeamPoints(state, name) {
     const team = state.teams.find((t) => t.name === name)
     if (team) {
       team.points -= 1
     }
+  },
+  endMatch(state) {
+    state = { ...getInitialState() }
+  },
+  resetMatch(oldstate) {
+    console.log('POUET')
+    Object.assign(oldstate, getInitialState())
+  },
+}
+
+export const actions = {
+  async endMatch(store) {
+    console.log(store.state)
+    await matchService.create(store.state)
+    store.commit('match/endMatch')
   },
 }

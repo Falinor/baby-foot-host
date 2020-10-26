@@ -4,14 +4,16 @@
     <div>
       <score :teams="teams"></score>
     </div>
-    <v-dialog v-model="win" persistent fullscreen
-      ><v-card
-        ><v-card-text><center>WE HAVE A WINNER</center></v-card-text></v-card
-      ></v-dialog
-    >
+    <v-dialog v-model="win" persistent fullscreen>
+      <v-card>
+        <v-card-text>
+          <center>WE HAVE A WINNER</center>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="dialog" persistent max-width="290">
       <v-card>
-        <v-card-title class="headline">Valider le dernier but ?</v-card-title>
+        <v-card-title class="headline">Validate last goal?</v-card-title>
         <v-card-text>
           <center>
             {{ teams[0].name }} {{ teams[0].points }} - {{ teams[1].points }}
@@ -20,8 +22,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="yellow darken-1" @click="gameWinner()"> Oui </v-btn>
-          <v-btn color="yellow darken-1" @click="fakeGoal()"> Non </v-btn>
+          <v-btn color="yellow darken-1" @click="gameWinner()">Yes</v-btn>
+          <v-btn color="yellow darken-1" @click="fakeGoal()">No</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -153,12 +155,13 @@ export default {
     stopAmbiance() {
       this.ambiance.pause()
     },
-    gameWinner() {
+    async gameWinner() {
       this.win = true
       this.ambiance.pause()
       const a = new Audio('./sounds/Final.mp3')
       a.volume = 1
       a.play()
+      await this.$store.dispatch('match/endMatch')
       setTimeout(() => {
         this.$router.replace('/')
       }, 5000)

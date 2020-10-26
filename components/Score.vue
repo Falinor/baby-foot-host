@@ -3,15 +3,19 @@
     <v-sheet class="score mx-auto" light elevation="16" width="400" height="70">
       <div class="team">
         <h5 class="name text-h5">{{ batmen.name }}</h5>
-        <v-icon @click="plusPoints(batmen)">mdi-plus</v-icon>
-        <v-icon @click="minusPoints(batmen)">mdi-minus</v-icon>
+        <div class="buttons">
+          <v-icon small @click="plusPoints(batmen)">mdi-plus</v-icon>
+          <v-icon small @click="minusPoints(batmen)">mdi-minus</v-icon>
+        </div>
         <h2 class="points text-h2">{{ batmen.points }}</h2>
       </div>
       <v-divider vertical />
       <div class="team">
         <h2 class="points text-h2">{{ jokers.points }}</h2>
-        <v-icon @click="plusPoints(jokers)">mdi-plus</v-icon>
-        <v-icon @click="minusPoints(jokers)">mdi-minus</v-icon>
+        <div class="buttons">
+          <v-icon small @click="plusPoints(jokers)">mdi-plus</v-icon>
+          <v-icon small @click="minusPoints(jokers)">mdi-minus</v-icon>
+        </div>
         <h5 class="name text-h5">{{ jokers.name }}</h5>
       </div>
     </v-sheet>
@@ -85,16 +89,22 @@ export default {
   padding: 0 1rem;
   display: flex;
   align-items: center;
-  flex: auto;
+  flex: 1 0 50%;
 }
 
 .points {
   display: inline;
+  padding: 0 4px;
 }
 
 .name {
   display: inline;
   padding: 0 1rem;
+}
+
+.buttons {
+  display: flex;
+  flex-flow: column;
 }
 
 .timer {

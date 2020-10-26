@@ -34,6 +34,8 @@ export const actions = {
       (players, i) => {
         return {
           players,
+          points: 0,
+          name: i === 0 ? 'batman' : 'joker',
           color: i === 0 ? 'black' : 'purple',
         }
       }
