@@ -25,14 +25,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <notification v-model="notification.show" :color="notification.color">
+      {{ notification.text }}
+    </notification>
   </v-container>
 </template>
 
 <script>
+import Notification from '@/components/Notification'
 import { config } from '@/core'
-import { matchService } from '@/services'
+import { matchService, recorderService } from '@/services'
 
 export default {
+  components: { Notification },
   data() {
     return {
       goalNb: 0,
@@ -69,6 +74,11 @@ export default {
         './sounds/Goal9.mp3',
         './sounds/Goal10.mp3',
       ],
+      notification: {
+        show: false,
+        color: 'accent',
+        text: undefined,
+      },
     }
   },
   computed: {
@@ -82,10 +92,14 @@ export default {
       return this.teams.some((team) => team.points === config.maxPoints)
     },
   },
-  watch: {
-    score(newScore) {
-      this.dialog = newScore === config.maxPoints
-    },
+  async created() {
+    try {
+      await recorderService.connect()
+      await recorderService.startRecording()
+    } catch (err) {
+      this.notification.text = 'Recording unavailable'
+      this.notification.show = true
+    }
   },
   mounted() {
     this.playAmbiance()
@@ -99,12 +113,10 @@ export default {
       }
     })
   },
-  destroyed() {
-    try {
-      this.stopGoal()
-    } catch (err) {
-      console.error(err)
-    }
+  async destroyed() {
+    await recorderService.stopRecording()
+    recorderService.disconnect()
+    this.stopGoal()
     this.stopAmbiance()
     this.$store.commit('match/resetMatch')
   },

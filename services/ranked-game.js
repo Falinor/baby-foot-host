@@ -1,12 +1,12 @@
 import axios from 'axios'
 
 import { config } from '@/core'
-import { playerService } from '@/services/index'
+import { playerService } from '@/services'
 
 export class RankedGameService {
   constructor() {
     this.http = axios.create({
-      baseURL: config.battlemytheAPI,
+      baseURL: config.battlemythe.api,
     })
   }
 
@@ -17,5 +17,12 @@ export class RankedGameService {
       attraction.players.map((playerId) => playerService.get(playerId))
     )
     return { ...attraction, players }
+  }
+
+  async startAttraction() {
+    await this.http.post('/attractions/babyfoot/start', {
+      userId: config.battlemythe.userId,
+      password: config.battlemythe.password,
+    })
   }
 }

@@ -12,4 +12,6 @@ export class FakeRankedGameService {
       status: Status.FREE,
     }
   }
+
+  startAttraction() {}
 }
