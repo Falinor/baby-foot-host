@@ -14,6 +14,7 @@ export const getInitialState = () => {
 export const state = () => getInitialState()
 
 export const getters = {
+  mode: (state) => state.mode,
   teams: (state) => state.teams,
   score: (state) => (team) => state.teams.find((t) => t.name === team).points,
 }

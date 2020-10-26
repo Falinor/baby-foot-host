@@ -37,6 +37,7 @@
 import Notification from '@/components/Notification'
 import { config, GameMode } from '@/core'
 import { matchService, rankedGameService, recorderService } from '@/services'
+import { mapGetters } from 'vuex'
 
 export default {
   components: { Notification },
@@ -84,9 +85,7 @@ export default {
     }
   },
   computed: {
-    teams() {
-      return this.$store.getters['match/teams']
-    },
+    ...mapGetters('match', ['teams', 'mode']),
     score() {
       return (name) => this.$store.getters['match/score'](name)
     },
@@ -102,7 +101,7 @@ export default {
       this.notification.text = 'Recording unavailable'
       this.notification.show = true
     }
-    if (this.match.mode === GameMode.RANKED) {
+    if (this.mode === GameMode.RANKED) {
       await rankedGameService.startAttraction()
     }
   },
