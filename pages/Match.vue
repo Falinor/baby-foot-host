@@ -2,7 +2,7 @@
   <v-container fluid class="container">
     <v-btn x-large @click="cancelMatch">Cancel Match</v-btn>
     <div>
-      <score :teams="teams"></score>
+      <score :teams="teams" @goal="onGoal"></score>
     </div>
     <v-dialog v-model="win" persistent fullscreen>
       <v-card>
@@ -106,14 +106,10 @@ export default {
   async mounted() {
     await this.playAmbiance()
     await this.startSceneRotation()
-    matchService.onMatchUpdate(async (teamName) => {
+
+    matchService.onMatchUpdate((teamName) => {
       const scoringTeam = this.teams.find((team) => team.name !== teamName)
-      this.$store.commit('match/incrementTeamPoints', scoringTeam.name)
-      await this.playGoal()
-      if (scoringTeam.points === 10) {
-        this.winner = scoringTeam
-        this.dialog = true
-      }
+      this.onGoal(scoringTeam)
     })
   },
   async destroyed() {
@@ -133,9 +129,16 @@ export default {
       this.goal.volume = 1
       await this.goal.play()
       // Resume ambiance after the goal has ended
-      this.goal.addEventListener('ended', () => this.ambiance.play(), {
-        once: true,
-      })
+      this.goal.addEventListener(
+        'ended',
+        () => {
+          this.ambiance.play()
+          this.startSceneRotation()
+        },
+        {
+          once: true,
+        }
+      )
     },
     stopGoal() {
       this.goal.pause()
@@ -165,11 +168,9 @@ export default {
       this.ambiance.pause()
       const final = new Audio('/sounds/Final.mp3')
       final.volume = 1
-      await final.play()
-      await this.$store.dispatch('match/endMatch')
-      setTimeout(() => {
-        this.$router.replace('/')
-      }, 5000)
+      await Promise.all([final.play(), this.$store.dispatch('match/endMatch')])
+      await delay(5000)
+      await this.$router.replace('/')
     },
     async cancelMatch() {
       if (this.mode === GameMode.RANKED) {
@@ -177,12 +178,23 @@ export default {
       }
       await this.$router.replace('/')
     },
+    async onGoal(team) {
+      this.stopSceneRotation()
+      await recorderService.switchScene(`Camera ${team.name}`)
+      await this.playGoal()
+      this.$store.commit('match/incrementTeamPoints', team.name)
+
+      if (team.points === 10) {
+        this.winner = team
+        this.dialog = true
+      }
+    },
     async startSceneRotation() {
       this.sceneRotation = true
       const scenes = [
-        { name: Scene.CAMERA_BATMAN, duration: 10000 },
-        { name: Scene.CAMERA_JOKER, duration: 10000 },
-        { name: Scene.HOST, duration: 5000 },
+        { name: Scene.HOST, duration: 2000 },
+        { name: Scene.CAMERA_BATMAN, duration: 5000 },
+        { name: Scene.CAMERA_JOKER, duration: 5000 },
       ]
       const doSwitch = async (i) => {
         try {
@@ -190,7 +202,7 @@ export default {
             const scene = scenes[i]
             await recorderService.switchScene(scene.name)
             await delay(scene.duration)
-            await doSwitch(i++ % scenes.length)
+            await doSwitch((i + 1) % scenes.length)
           }
         } catch (err) {}
       }

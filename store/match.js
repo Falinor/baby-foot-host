@@ -5,8 +5,8 @@ export const getInitialState = () => {
   return {
     mode: GameMode.QUICKPLAY,
     teams: [
-      { color: 'black', name: 'batman', players: [], points: 0 },
-      { color: 'purple', name: 'joker', players: [], points: 0 },
+      { color: 'black', name: 'Batman', players: [], points: 0 },
+      { color: 'purple', name: 'Joker', players: [], points: 0 },
     ],
   }
 }

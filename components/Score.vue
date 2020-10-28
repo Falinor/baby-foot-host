@@ -26,6 +26,8 @@
 </template>
 
 <script>
+import { config } from '@/core'
+
 export default {
   props: {
     teams: {
@@ -66,8 +68,9 @@ export default {
         this.$store.commit('match/decrementTeamPoints', team.name)
     },
     plusPoints(team) {
-      if (team.points <= 9)
-        this.$store.commit('match/incrementTeamPoints', team.name)
+      if (team.points < config.maxPoints) {
+        this.$emit('goal', team)
+      }
     },
   },
 }
