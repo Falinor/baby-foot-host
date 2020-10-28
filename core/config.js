@@ -7,6 +7,7 @@ export const config = {
     userId: process.env.BATTLEMYTHE_USERID,
     password: process.env.BATTLEMYTHE_PASSWORD,
   },
+  env: process.env.NODE_ENV,
   maxPoints: 10,
   obs: process.env.OBS ?? 'localhost:4444',
   record: process.env.NODE_ENV === 'production',

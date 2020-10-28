@@ -7,7 +7,6 @@ export function state() {
   return {
     playOpening: false,
     status: Status.FREE,
-    gameMode: null,
   }
 }
 
