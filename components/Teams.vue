@@ -3,7 +3,7 @@
     <v-card-text class="teams">
       <v-col v-for="(team, i) of filledTeams" :key="i" cols="6">
         <div v-for="(player, j) of team.players" :key="j" class="player">
-          <span class="text-h4" :style="{ color: team.color }">
+          <span class="text-h5" :style="{ color: team.color }">
             <template v-if="player">{{ player.nickname }}</template>
             <template v-else>Waiting for player...</template>
           </span>
