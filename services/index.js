@@ -15,6 +15,6 @@ export const rankedGameService =
   config.env === 'production'
     ? new RankedGameService()
     : new FakeRankedGameService()
-export const recorderService = config.record
+export const recorderService = !config.record
   ? new RecorderService()
   : new FakeRecorderService()

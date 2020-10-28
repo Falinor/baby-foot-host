@@ -34,16 +34,18 @@
 </template>
 
 <script>
-import Notification from '@/components/Notification'
-import { config, GameMode } from '@/core'
-import { matchService, rankedGameService, recorderService } from '@/services'
 import { sumBy } from 'lodash'
 import { mapGetters } from 'vuex'
+
+import Notification from '@/components/Notification'
+import { config, delay, GameMode, Scene } from '@/core'
+import { matchService, rankedGameService, recorderService } from '@/services'
 
 export default {
   components: { Notification },
   data() {
     return {
+      sceneRotation: true,
       goalNb: 0,
       win: false,
       winner: null,
@@ -92,9 +94,9 @@ export default {
   async created() {
     try {
       await recorderService.connect()
-      await recorderService.startRecording()
+      // await recorderService.startRecording()
     } catch (err) {
-      this.notification.text = 'Recording unavailable'
+      this.notification.text = 'Stream unavailable'
       this.notification.show = true
     }
     if (this.mode === GameMode.RANKED) {
@@ -103,6 +105,7 @@ export default {
   },
   async mounted() {
     await this.playAmbiance()
+    await this.startSceneRotation()
     matchService.onMatchUpdate(async (teamName) => {
       const scoringTeam = this.teams.find((team) => team.name !== teamName)
       this.$store.commit('match/incrementTeamPoints', scoringTeam.name)
@@ -114,7 +117,8 @@ export default {
     })
   },
   async destroyed() {
-    await recorderService.stopRecording()
+    await recorderService.switchScene(Scene.HOST)
+    // await recorderService.stopRecording()
     recorderService.disconnect()
     this.stopGoal()
     this.stopAmbiance()
@@ -150,7 +154,7 @@ export default {
       )
       this.ambiance.volume = 0.4
       this.ambiance.loop = false
-      this.ambiance.src = './sounds/start.mp3'
+      this.ambiance.src = '/sounds/start.mp3'
       await this.ambiance.play()
     },
     stopAmbiance() {
@@ -172,6 +176,28 @@ export default {
         await rankedGameService.stopAttraction()
       }
       await this.$router.replace('/')
+    },
+    async startSceneRotation() {
+      this.sceneRotation = true
+      const scenes = [
+        { name: Scene.CAMERA_BATMAN, duration: 10000 },
+        { name: Scene.CAMERA_JOKER, duration: 10000 },
+        { name: Scene.HOST, duration: 5000 },
+      ]
+      const doSwitch = async (i) => {
+        try {
+          if (this.sceneRotation) {
+            const scene = scenes[i]
+            await recorderService.switchScene(scene.name)
+            await delay(scene.duration)
+            await doSwitch(i++ % scenes.length)
+          }
+        } catch (err) {}
+      }
+      await doSwitch(0)
+    },
+    stopSceneRotation() {
+      this.sceneRotation = false
     },
   },
 }

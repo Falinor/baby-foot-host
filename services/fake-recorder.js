@@ -15,5 +15,9 @@ export class FakeRecorderService {
     console.log('Stop recording')
   }
 
-  async listRecords() {}
+  listRecords() {}
+
+  switchScene(name) {
+    console.log('Switching scene to', name)
+  }
 }

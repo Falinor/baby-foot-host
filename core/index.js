@@ -1,4 +1,6 @@
 export * from './array'
 export * from './config'
 export * from './game-mode'
+export * from './scene'
 export * from './status'
+export * from './timeout'
