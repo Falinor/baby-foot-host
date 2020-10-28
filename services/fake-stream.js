@@ -1,4 +1,4 @@
-export class FakeRecorderService {
+export class FakeStreamService {
   connect() {
     console.log('Connected to the recorder service')
   }

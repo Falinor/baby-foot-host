@@ -39,7 +39,7 @@ import { mapGetters } from 'vuex'
 
 import Notification from '@/components/Notification'
 import { config, delay, GameMode, Scene } from '@/core'
-import { matchService, rankedGameService, recorderService } from '@/services'
+import { matchService, rankedGameService, streamService } from '@/services'
 
 export default {
   components: { Notification },
@@ -93,8 +93,8 @@ export default {
   },
   async created() {
     try {
-      await recorderService.connect()
-      // await recorderService.startRecording()
+      await streamService.connect()
+      // await streamService.startRecording()
     } catch (err) {
       this.notification.text = 'Stream unavailable'
       this.notification.show = true
@@ -113,9 +113,9 @@ export default {
     })
   },
   async destroyed() {
-    await recorderService.switchScene(Scene.HOST)
-    // await recorderService.stopRecording()
-    recorderService.disconnect()
+    await streamService.switchScene(Scene.HOST)
+    // await streamService.stopRecording()
+    streamService.disconnect()
     this.stopGoal()
     this.stopAmbiance()
     this.$store.commit('match/endMatch', { root: true })
@@ -180,7 +180,7 @@ export default {
     },
     async onGoal(team) {
       this.stopSceneRotation()
-      await recorderService.switchScene(`Camera ${team.name}`)
+      await streamService.switchScene(`Camera ${team.name}`)
       await this.playGoal()
       this.$store.commit('match/incrementTeamPoints', team.name)
 
@@ -192,15 +192,15 @@ export default {
     async startSceneRotation() {
       this.sceneRotation = true
       const scenes = [
-        { name: Scene.HOST, duration: 2000 },
-        { name: Scene.CAMERA_BATMAN, duration: 5000 },
-        { name: Scene.CAMERA_JOKER, duration: 5000 },
+        { name: Scene.HOST, duration: 5000 },
+        { name: Scene.CAMERA_BATMAN, duration: 10000 },
+        { name: Scene.CAMERA_JOKER, duration: 10000 },
       ]
       const doSwitch = async (i) => {
         try {
           if (this.sceneRotation) {
             const scene = scenes[i]
-            await recorderService.switchScene(scene.name)
+            await streamService.switchScene(scene.name)
             await delay(scene.duration)
             await doSwitch((i + 1) % scenes.length)
           }

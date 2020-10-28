@@ -2,7 +2,7 @@ import OBSWebSocket from 'obs-websocket-js'
 
 import { config } from '@/core'
 
-export class RecorderService {
+export class StreamService {
   constructor() {
     this.obs = new OBSWebSocket()
   }
@@ -18,11 +18,11 @@ export class RecorderService {
   }
 
   async startRecording() {
-    // await this.obs.send('StartRecording')
+    await this.obs.send('StartRecording')
   }
 
   async stopRecording() {
-    // await this.obs.send('StopRecording')
+    await this.obs.send('StopRecording')
   }
 
   async listRecords() {}

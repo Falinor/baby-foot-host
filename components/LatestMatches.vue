@@ -2,6 +2,12 @@
   <v-card>
     <v-card-title> Latest matches </v-card-title>
     <v-data-iterator :items="matches" :items-per-page="5">
+      <template v-slot:no-data>
+        <p class="no-result">No match has been played yet.</p>
+      </template>
+      <template v-slot:no-results>
+        <p class="no-result">No match found for this search.</p>
+      </template>
       <template v-slot:default="{ items }">
         <v-list dense>
           <v-list-item v-for="match in items" :key="match.id">
@@ -55,6 +61,10 @@ export default {
 </script>
 
 <style scoped>
+.no-result {
+  padding: 0 1rem;
+}
+
 .match {
   text-align: center;
 }
