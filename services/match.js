@@ -17,8 +17,12 @@ export class MatchService {
     console.info(`Socket connected ${this.socket.id}`)
   }
 
-  create(match) {
-    return this.http.post('/matches', toAPI(match))
+  async create(match) {
+    await this.http.post('/matches', toAPI(match))
+  }
+
+  find() {
+    return this.http.get('/matches').then((res) => res.data)
   }
 
   onMatchUpdate(callback) {

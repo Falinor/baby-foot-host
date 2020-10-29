@@ -3,9 +3,12 @@
     <opening v-if="playOpening" />
     <template v-else>
       <v-row>
-        <v-col class="modes" cols="8">
+        <v-col class="modes" cols="4">
           <v-btn to="/ranked" x-large text>Ranked game</v-btn>
           <v-btn to="/match" x-large text>Quickplay</v-btn>
+        </v-col>
+        <v-col cols="4">
+          <latest-matches />
         </v-col>
         <v-col class="leaderboards" cols="4">
           <team-leaderboard class="leaderboard" />
@@ -19,12 +22,14 @@
 <script>
 import { mapGetters } from 'vuex'
 
+import LatestMatches from '@/components/LatestMatches.vue'
 import Opening from '@/components/Opening.vue'
 import PlayerLeaderboard from '@/components/PlayerLeaderboard.vue'
 import TeamLeaderboard from '@/components/TeamLeaderboard.vue'
 
 export default {
   components: {
+    LatestMatches,
     TeamLeaderboard,
     PlayerLeaderboard,
     Opening,

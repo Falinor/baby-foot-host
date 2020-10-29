@@ -2,7 +2,7 @@ import OBSWebSocket from 'obs-websocket-js'
 
 import { config } from '@/core'
 
-export class RecorderService {
+export class StreamService {
   constructor() {
     this.obs = new OBSWebSocket()
   }
@@ -26,4 +26,12 @@ export class RecorderService {
   }
 
   async listRecords() {}
+
+  async switchScene(name) {
+    await this.obs.send('SetCurrentScene', { 'scene-name': name })
+  }
+
+  listScenes() {
+    return this.obs.send('GetSceneList')
+  }
 }

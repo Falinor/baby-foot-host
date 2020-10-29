@@ -12,13 +12,11 @@
       ></v-text-field>
     </v-card-title>
     <v-data-table
-      disable-pagination
-      disable-sort
-      hide-default-footer
       :headers="headers"
       :items="items"
       :search="search"
       :loading="loading"
+      :items-per-page="5"
     ></v-data-table>
   </v-card>
 </template>
@@ -45,7 +43,7 @@ export default {
       { text: 'Nickname', value: 'nickname' },
       { text: 'Rank', value: 'rank' },
       { text: 'Wins', value: 'wins' },
-      { text: 'Losses', values: 'losses' },
+      { text: 'Losses', value: 'losses' },
     ],
   }),
 }

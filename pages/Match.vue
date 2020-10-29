@@ -1,8 +1,8 @@
 <template>
   <v-container fluid class="container">
-    <v-btn x-large to="/">Cancel Match</v-btn>
+    <v-btn x-large @click="cancelMatch">Cancel Match</v-btn>
     <div>
-      <score :teams="teams"></score>
+      <score :teams="teams" @goal="onGoal"></score>
     </div>
     <v-dialog v-model="win" persistent fullscreen>
       <v-card>
@@ -34,48 +34,49 @@
 </template>
 
 <script>
-import Notification from '@/components/Notification'
-import { config, GameMode } from '@/core'
-import { matchService, rankedGameService, recorderService } from '@/services'
+import { sumBy } from 'lodash'
 import { mapGetters } from 'vuex'
+
+import Notification from '@/components/Notification'
+import { config, delay, GameMode, Scene } from '@/core'
+import { matchService, rankedGameService, streamService } from '@/services'
 
 export default {
   components: { Notification },
   data() {
     return {
+      sceneRotation: true,
       goalNb: 0,
       win: false,
       winner: null,
-      goal: null,
-      supporter: null,
-      ambiance: null,
+      goal: new Audio(),
+      ambiance: new Audio(),
       ambianceList: [
-        './sounds/PSG.mp3',
-        './sounds/Crowd1.mp3',
-        './sounds/Strasbourgeois.mp3',
-        './sounds/Crowd2.mp3',
-        './sounds/Qui ne saute pas.wav',
-        './sounds/Crowd3.mp3', // 2.27
-        './sounds/Allezlaval.mp3',
-        './sounds/Crowd4.mp3',
-        './sounds/Cantona.wav', // 4.32
-        './sounds/Crowd5.mp3',
-        './sounds/Diabos.mp3',
-        './sounds/Crowd4.mp3',
+        '/sounds/PSG.mp3',
+        '/sounds/Crowd1.mp3',
+        '/sounds/Strasbourgeois.mp3',
+        '/sounds/Crowd2.mp3',
+        '/sounds/Qui ne saute pas.mp3',
+        '/sounds/Crowd3.mp3', // 2.27
+        '/sounds/Allezlaval.mp3',
+        '/sounds/Crowd4.mp3',
+        '/sounds/Cantona.mp3', // 4.32
+        '/sounds/Crowd5.mp3',
+        '/sounds/Diabos.mp3',
+        '/sounds/Crowd4.mp3',
       ],
       goalList: [
-        './sounds/PAVARD.mp3',
-        './sounds/Goal.mp3',
-        './sounds/Goal1.mp3',
-        './sounds/Goal2.mp3',
-        './sounds/Goal3.mp3',
-        './sounds/Goal4.mp3',
-        './sounds/Goal5.mp3',
-        './sounds/Goal6.mp3',
-        './sounds/Goal7.mp3',
-        './sounds/Goal8.mp3',
-        './sounds/Goal9.mp3',
-        './sounds/Goal10.mp3',
+        '/sounds/Goal.mp3',
+        '/sounds/Goal1.mp3',
+        '/sounds/Goal2.mp3',
+        '/sounds/Goal3.mp3',
+        '/sounds/Goal4.mp3',
+        '/sounds/Goal5.mp3',
+        '/sounds/Goal6.mp3',
+        '/sounds/Goal7.mp3',
+        '/sounds/Goal8.mp3',
+        '/sounds/Goal9.mp3',
+        '/sounds/Goal10.mp3',
       ],
       notification: {
         show: false,
@@ -86,73 +87,78 @@ export default {
   },
   computed: {
     ...mapGetters('match', ['teams', 'mode']),
-    score() {
-      return (name) => this.$store.getters['match/score'](name)
-    },
     dialog() {
       return this.teams.some((team) => team.points === config.maxPoints)
     },
   },
   async created() {
     try {
-      await recorderService.connect()
-      await recorderService.startRecording()
+      await streamService.connect()
+      // await streamService.startRecording()
     } catch (err) {
-      this.notification.text = 'Recording unavailable'
+      this.notification.text = 'Stream unavailable'
       this.notification.show = true
     }
     if (this.mode === GameMode.RANKED) {
       await rankedGameService.startAttraction()
     }
   },
-  mounted() {
-    this.playAmbiance()
+  async mounted() {
+    await this.playAmbiance()
+    await this.startSceneRotation()
+
     matchService.onMatchUpdate((teamName) => {
       const scoringTeam = this.teams.find((team) => team.name !== teamName)
-      this.$store.commit('match/incrementTeamPoints', scoringTeam.name)
-      this.playGoal()
-      if (scoringTeam.points === 10) {
-        this.winner = scoringTeam
-        this.dialog = true
-      }
+      this.onGoal(scoringTeam)
     })
   },
   async destroyed() {
-    await recorderService.stopRecording()
-    recorderService.disconnect()
+    await streamService.switchScene(Scene.HOST)
+    // await streamService.stopRecording()
+    streamService.disconnect()
     this.stopGoal()
     this.stopAmbiance()
-    this.$store.commit('match/endMatch')
+    this.$store.commit('match/endMatch', { root: true })
   },
   methods: {
-    playGoal() {
-      const i = this.goalList[this.goalNb]
-      const goal = new Audio(i)
-      goal.volume = 1
-      goal.play()
-      if (this.goalNb === this.goalList.length - 1) this.goalNb = 0
-      else this.goalNb++
+    async playGoal() {
+      this.ambiance.pause()
+      // Return a sound sequentially depending on the score
+      const sound = sumBy(this.teams, 'points') % this.goalList.length
+      this.goal.src = this.goalList[sound]
+      this.goal.volume = 1
+      await this.goal.play()
+      // Resume ambiance after the goal has ended
+      this.goal.addEventListener(
+        'ended',
+        () => {
+          this.ambiance.play()
+          this.startSceneRotation()
+        },
+        {
+          once: true,
+        }
+      )
     },
     stopGoal() {
       this.goal.pause()
     },
-    playAmbiance() {
+    async playAmbiance() {
       const playlist = this.ambianceList
       let i = 0
-      this.ambiance = new Audio()
       this.ambiance.addEventListener(
         'ended',
-        () => {
+        async () => {
           i = i++ < playlist.length ? i : 0
           this.ambiance.src = playlist[i]
-          this.ambiance.play()
+          await this.ambiance.play()
         },
         true
       )
       this.ambiance.volume = 0.4
       this.ambiance.loop = false
-      this.ambiance.src = './sounds/start.mp3'
-      this.ambiance.play()
+      this.ambiance.src = '/sounds/start.mp3'
+      await this.ambiance.play()
     },
     stopAmbiance() {
       this.ambiance.pause()
@@ -160,13 +166,50 @@ export default {
     async gameWinner() {
       this.win = true
       this.ambiance.pause()
-      const a = new Audio('./sounds/Final.mp3')
-      a.volume = 1
-      a.play()
-      await this.$store.dispatch('match/endMatch')
-      setTimeout(() => {
-        this.$router.replace('/')
-      }, 5000)
+      const final = new Audio('/sounds/Final.mp3')
+      final.volume = 1
+      await Promise.all([final.play(), this.$store.dispatch('match/endMatch')])
+      await delay(5000)
+      await this.$router.replace('/')
+    },
+    async cancelMatch() {
+      if (this.mode === GameMode.RANKED) {
+        await rankedGameService.stopAttraction()
+      }
+      await this.$router.replace('/')
+    },
+    async onGoal(team) {
+      this.stopSceneRotation()
+      await streamService.switchScene(`Camera ${team.name}`)
+      await this.playGoal()
+      this.$store.commit('match/incrementTeamPoints', team.name)
+
+      if (team.points === 10) {
+        this.winner = team
+        this.dialog = true
+      }
+    },
+    async startSceneRotation() {
+      this.sceneRotation = true
+      const scenes = [
+        { name: Scene.HOST, duration: 5000 },
+        { name: Scene.CAMERA_BATMAN, duration: 10000 },
+        { name: Scene.CAMERA_JOKER, duration: 10000 },
+      ]
+      const doSwitch = async (i) => {
+        try {
+          if (this.sceneRotation) {
+            const scene = scenes[i]
+            await streamService.switchScene(scene.name)
+            await delay(scene.duration)
+            await doSwitch((i + 1) % scenes.length)
+          }
+        } catch (err) {}
+      }
+      await doSwitch(0)
+    },
+    stopSceneRotation() {
+      this.sceneRotation = false
     },
   },
 }

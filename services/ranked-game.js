@@ -25,4 +25,11 @@ export class RankedGameService {
       password: config.battlemythe.password,
     })
   }
+
+  async stopAttraction() {
+    await this.http.post('/attractions/babyfoot/cancel', {
+      userId: config.battlemythe.userId,
+      password: config.battlemythe.password,
+    })
+  }
 }

@@ -1,4 +1,4 @@
-export class FakeRecorderService {
+export class FakeStreamService {
   connect() {
     console.log('Connected to the recorder service')
   }
@@ -15,5 +15,9 @@ export class FakeRecorderService {
     console.log('Stop recording')
   }
 
-  async listRecords() {}
+  listRecords() {}
+
+  switchScene(name) {
+    console.log('Switching scene to', name)
+  }
 }
