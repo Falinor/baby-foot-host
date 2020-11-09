@@ -8,7 +8,7 @@
           <v-btn to="/match" x-large text>Quickplay</v-btn>
         </v-col>
         <v-col cols="4">
-          <latest-matches />
+          <matches :matches="matches" />
         </v-col>
         <v-col class="leaderboards" cols="4">
           <team-leaderboard class="leaderboard" />
@@ -22,35 +22,36 @@
 <script>
 import { mapGetters } from 'vuex'
 
-import LatestMatches from '@/components/LatestMatches.vue'
+import Matches from '@/components/Matches.vue'
 import Opening from '@/components/Opening.vue'
 import PlayerLeaderboard from '@/components/PlayerLeaderboard.vue'
 import TeamLeaderboard from '@/components/TeamLeaderboard.vue'
+import { matchService } from '@/services'
 
 export default {
   components: {
-    LatestMatches,
+    Matches,
     TeamLeaderboard,
     PlayerLeaderboard,
     Opening,
   },
-  data() {
-    return {
-      ambiance: null,
-    }
-  },
+  data: () => ({
+    ambiance: null,
+    matches: [],
+  }),
   computed: {
     ...mapGetters('app', ['playOpening']),
   },
-  mounted() {
+  async mounted() {
     this.playTheme()
+    this.matches = await matchService.find()
   },
   destroyed() {
     this.stopTheme()
   },
   methods: {
     playTheme() {
-      this.ambiance = new Audio('./sounds/Menu Theme.mp3')
+      this.ambiance = new Audio('/sounds/Menu Theme.mp3')
       this.ambiance.play()
     },
     stopTheme() {

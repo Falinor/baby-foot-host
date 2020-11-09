@@ -43,14 +43,13 @@
 
 <script>
 import { config } from '@/core'
-import { matchService } from '@/services'
 
 export default {
-  data: () => ({
-    matches: [],
-  }),
-  async mounted() {
-    this.matches = await matchService.find()
+  props: {
+    matches: {
+      type: Array,
+      default: () => [],
+    },
   },
   methods: {
     isWinner(team) {

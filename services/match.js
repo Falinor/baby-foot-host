@@ -21,8 +21,9 @@ export class MatchService {
     await this.http.post('/matches', toAPI(match))
   }
 
-  find() {
-    return this.http.get('/matches').then((res) => res.data)
+  async find() {
+    const { data: matches } = await this.http.get('/matches')
+    return matches
   }
 
   onMatchUpdate(callback) {

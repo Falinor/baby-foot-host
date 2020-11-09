@@ -2,7 +2,11 @@
   <v-container fluid class="container">
     <v-btn x-large @click="cancelMatch">Cancel Match</v-btn>
     <div>
-      <score :teams="teams" @goal="onGoal"></score>
+      <score
+        :teams="teams"
+        @increment="increment"
+        @decrement="decrement"
+      ></score>
     </div>
     <v-dialog v-model="win" persistent fullscreen>
       <v-card>
@@ -22,8 +26,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="yellow darken-1" @click="gameWinner()">Yes</v-btn>
-          <v-btn color="yellow darken-1" @click="fakeGoal()">No</v-btn>
+          <v-btn color="yellow darken-1" @click="gameWinner">Yes</v-btn>
+          <v-btn color="yellow darken-1" @click="cancelWinner">No</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -34,10 +38,10 @@
 </template>
 
 <script>
-import { sumBy } from 'lodash'
+import { maxBy, sumBy } from 'lodash'
 import { mapGetters } from 'vuex'
 
-import Notification from '@/components/Notification'
+import Notification from '@/components/Notification.vue'
 import { config, delay, GameMode, Scene } from '@/core'
 import { matchService, rankedGameService, streamService } from '@/services'
 
@@ -94,7 +98,7 @@ export default {
   async created() {
     try {
       await streamService.connect()
-      // await streamService.startRecording()
+      await streamService.startRecording()
     } catch (err) {
       this.notification.text = 'Stream unavailable'
       this.notification.show = true
@@ -109,12 +113,12 @@ export default {
 
     matchService.onMatchUpdate((teamName) => {
       const scoringTeam = this.teams.find((team) => team.name !== teamName)
-      this.onGoal(scoringTeam)
+      this.increment(scoringTeam)
     })
   },
   async destroyed() {
     await streamService.switchScene(Scene.HOST)
-    // await streamService.stopRecording()
+    await streamService.stopRecording()
     streamService.disconnect()
     this.stopGoal()
     this.stopAmbiance()
@@ -172,22 +176,33 @@ export default {
       await delay(5000)
       await this.$router.replace('/')
     },
+    async cancelWinner() {
+      this.win = false
+      await this.ambiance.play()
+      const team = maxBy(this.teams, 'points')
+      this.$store.commit('match/decrementTeamPoints', team.name)
+    },
     async cancelMatch() {
       if (this.mode === GameMode.RANKED) {
         await rankedGameService.stopAttraction()
       }
       await this.$router.replace('/')
     },
-    async onGoal(team) {
-      this.stopSceneRotation()
-      await streamService.switchScene(`Camera ${team.name}`)
-      await this.playGoal()
-      this.$store.commit('match/incrementTeamPoints', team.name)
+    async increment(team) {
+      if (team.points < config.maxPoints) {
+        this.stopSceneRotation()
+        await streamService.switchScene(`Camera ${team.name}`)
+        await this.playGoal()
+        this.$store.commit('match/incrementTeamPoints', team.name)
 
-      if (team.points === 10) {
-        this.winner = team
-        this.dialog = true
+        if (team.points === config.maxPoints) {
+          this.winner = team
+          this.dialog = true
+        }
       }
+    },
+    decrement(team) {
+      this.$store.commit('match/decrementTeamPoints', team.name)
     },
     async startSceneRotation() {
       this.sceneRotation = true
