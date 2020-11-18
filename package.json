@@ -27,7 +27,7 @@
     "lodash": "^4.17.20",
     "nuxt": "^2.14.6",
     "obs-websocket-js": "^4.0.2",
-    "socket.io-client": "^2.3.1",
+    "socket.io-client": "^3.0.2",
     "vue-web-cam": "^1.9.0",
     "vuex-persist": "^3.1.3"
   },
