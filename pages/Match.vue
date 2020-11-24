@@ -1,12 +1,13 @@
 <template>
   <v-container fluid class="container">
+    <soccer-ball />
+    <sound ref="goal" :playlist="goals" @ended="onGoalEnd" />
+    <sound ref="ambiance" autoplay :playlist="ambiances" :volume="4" />
+    <goal-animation ref="batmanAnimation" src="/batman.mp4" />
+    <goal-animation ref="jokerAnimation" src="/joker.mp4" />
     <v-btn x-large @click="cancelMatch">Cancel Match</v-btn>
     <div>
-      <score
-        :teams="teams"
-        @increment="increment"
-        @decrement="decrement"
-      ></score>
+      <score :teams="teams" @increment="increment" @decrement="decrement" />
     </div>
     <v-dialog v-model="win" persistent fullscreen>
       <v-card>
@@ -38,24 +39,25 @@
 </template>
 
 <script>
-import { maxBy, sumBy } from 'lodash'
+import { maxBy } from 'lodash'
 import { mapGetters } from 'vuex'
 
+import GoalAnimation from '@/components/GoalAnimation.vue'
 import Notification from '@/components/Notification.vue'
+import SoccerBall from '@/components/SoccerBall.vue'
+import Sound from '@/components/Sound'
 import { config, delay, GameMode, Scene } from '@/core'
 import { matchService, rankedGameService, streamService } from '@/services'
 
 export default {
-  components: { Notification },
+  components: { GoalAnimation, Notification, Sound, SoccerBall },
   data() {
     return {
       sceneRotation: true,
       goalNb: 0,
       win: false,
       winner: null,
-      goal: new Audio(),
-      ambiance: new Audio(),
-      ambianceList: [
+      ambiances: [
         '/sounds/PSG.mp3',
         '/sounds/Crowd1.mp3',
         '/sounds/Strasbourgeois.mp3',
@@ -69,7 +71,7 @@ export default {
         '/sounds/Diabos.mp3',
         '/sounds/Crowd4.mp3',
       ],
-      goalList: [
+      goals: [
         '/sounds/Goal.mp3',
         '/sounds/Goal1.mp3',
         '/sounds/Goal2.mp3',
@@ -110,7 +112,6 @@ export default {
   async mounted() {
     await this.playAmbiance()
     await this.startSceneRotation()
-
     matchService.onMatchUpdate((teamName) => {
       const scoringTeam = this.teams.find((team) => team.name !== teamName)
       this.increment(scoringTeam)
@@ -126,50 +127,24 @@ export default {
   },
   methods: {
     async playGoal() {
-      this.ambiance.pause()
-      // Return a sound sequentially depending on the score
-      const sound = sumBy(this.teams, 'points') % this.goalList.length
-      this.goal.src = this.goalList[sound]
-      this.goal.volume = 1
-      await this.goal.play()
-      // Resume ambiance after the goal has ended
-      this.goal.addEventListener(
-        'ended',
-        () => {
-          this.ambiance.play()
-          this.startSceneRotation()
-        },
-        {
-          once: true,
-        }
-      )
+      this.$refs.ambiance.pause()
+      await this.$refs.goal.next()
+    },
+    async onGoalEnd() {
+      await Promise.all([this.playAmbiance(), this.startSceneRotation()])
     },
     stopGoal() {
-      this.goal.pause()
+      this.$refs.goal.pause()
     },
     async playAmbiance() {
-      const playlist = this.ambianceList
-      let i = 0
-      this.ambiance.addEventListener(
-        'ended',
-        async () => {
-          i = i++ < playlist.length ? i : 0
-          this.ambiance.src = playlist[i]
-          await this.ambiance.play()
-        },
-        true
-      )
-      this.ambiance.volume = 0.4
-      this.ambiance.loop = false
-      this.ambiance.src = '/sounds/start.mp3'
-      await this.ambiance.play()
+      await this.$refs.ambiance.next()
     },
     stopAmbiance() {
-      this.ambiance.pause()
+      this.$refs.ambiance.pause()
     },
     async gameWinner() {
       this.win = true
-      this.ambiance.pause()
+      this.$refs.ambiance.pause()
       const final = new Audio('/sounds/Final.mp3')
       final.volume = 1
       await Promise.all([final.play(), this.$store.dispatch('match/endMatch')])
@@ -178,7 +153,7 @@ export default {
     },
     async cancelWinner() {
       this.win = false
-      await this.ambiance.play()
+      await this.playAmbiance()
       const team = maxBy(this.teams, 'points')
       this.$store.commit('match/decrementTeamPoints', team.name)
     },
@@ -191,6 +166,9 @@ export default {
     async increment(team) {
       if (team.points < config.maxPoints) {
         this.stopSceneRotation()
+        team.name === 'Batman'
+          ? await this.$refs.batmanAnimation.play()
+          : await this.$refs.jokerAnimation.play()
         await streamService.switchScene(`Camera ${team.name}`)
         await this.playGoal()
         this.$store.commit('match/incrementTeamPoints', team.name)
@@ -231,6 +209,16 @@ export default {
 </script>
 
 <style scoped>
+.animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  z-index: 9999;
+  transition: 1s opacity;
+}
+
 .container {
   height: 100%;
   background: center/cover no-repeat url('/soccer-field-from-above.jpg');
