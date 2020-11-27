@@ -14,7 +14,7 @@ export class MatchService {
       reconnectionAttempts: 3,
     })
     this.http = axios.create({ baseURL: config.babyfootAPI })
-    console.info(`Socket connected ${this.socket.id}`)
+    console.info('Socket connected')
   }
 
   async create(match) {
@@ -27,6 +27,7 @@ export class MatchService {
   }
 
   onMatchUpdate(callback) {
+    console.log('onMatchUpdate registered')
     this.socket.on(Events.MATCH_UPDATE, callback)
   }
 }

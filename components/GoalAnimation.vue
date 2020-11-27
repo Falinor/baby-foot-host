@@ -28,7 +28,6 @@ export default {
     },
     onEnd() {
       this.playing = false
-      console.log('onEnd')
     },
   },
 }

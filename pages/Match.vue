@@ -1,8 +1,15 @@
 <template>
   <v-container fluid class="container">
     <soccer-ball />
-    <sound ref="goal" :playlist="goals" @ended="onGoalEnd" />
-    <sound ref="ambiance" autoplay :playlist="ambiances" :volume="4" />
+    <sound ref="goal" fade-in fade-out :playlist="goals" @ended="onGoalEnd" />
+    <sound
+      ref="ambiance"
+      fade-in
+      fade-out
+      autoplay
+      :playlist="ambiances"
+      :volume="4"
+    />
     <goal-animation ref="batmanAnimation" src="/batman.mp4" />
     <goal-animation ref="jokerAnimation" src="/joker.mp4" />
     <v-btn x-large @click="cancelMatch">Cancel Match</v-btn>
@@ -46,7 +53,7 @@ import GoalAnimation from '@/components/GoalAnimation.vue'
 import Notification from '@/components/Notification.vue'
 import SoccerBall from '@/components/SoccerBall.vue'
 import Sound from '@/components/Sound'
-import { config, delay, GameMode, Scene } from '@/core'
+import { config, delay, end, GameMode, Scene } from '@/core'
 import { matchService, rankedGameService, streamService } from '@/services'
 
 export default {
@@ -110,33 +117,34 @@ export default {
     }
   },
   async mounted() {
-    await this.playAmbiance()
-    await this.startSceneRotation()
     matchService.onMatchUpdate((teamName) => {
       const scoringTeam = this.teams.find((team) => team.name !== teamName)
       this.increment(scoringTeam)
     })
+    await this.playAmbiance()
+    this.startSceneRotation().catch()
   },
   async destroyed() {
     await streamService.switchScene(Scene.HOST)
     await streamService.stopRecording()
     streamService.disconnect()
-    this.stopGoal()
-    this.stopAmbiance()
-    this.$store.commit('match/endMatch', { root: true })
   },
   methods: {
     async playGoal() {
+      console.log('Playing goal')
       this.$refs.ambiance.pause()
       await this.$refs.goal.next()
     },
     async onGoalEnd() {
-      await Promise.all([this.playAmbiance(), this.startSceneRotation()])
+      console.log('Goal end')
+      await this.playAmbiance()
+      this.startSceneRotation()
     },
     stopGoal() {
       this.$refs.goal.pause()
     },
     async playAmbiance() {
+      console.log('Playing ambiance')
       await this.$refs.ambiance.next()
     },
     stopAmbiance() {
@@ -148,7 +156,7 @@ export default {
       const final = new Audio('/sounds/Final.mp3')
       final.volume = 1
       await Promise.all([final.play(), this.$store.dispatch('match/endMatch')])
-      await delay(5000)
+      await end(final)
       await this.$router.replace('/')
     },
     async cancelWinner() {

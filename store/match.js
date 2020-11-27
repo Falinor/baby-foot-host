@@ -38,14 +38,15 @@ export const mutations = {
       team.points -= 1
     }
   },
-  endMatch(state) {
-    state = { ...getInitialState() }
+  reset(state) {
+    Object.assign(state, { ...getInitialState() })
   },
 }
 
 export const actions = {
   async endMatch(store) {
-    await matchService.create(store.state)
-    store.commit('match/endMatch')
+    if (store.state.mode === GameMode.RANKED) {
+      await matchService.create(store.state)
+    }
   },
 }

@@ -43,6 +43,7 @@ export default {
     ...mapGetters('app', ['playOpening']),
   },
   async mounted() {
+    this.$store.commit('match/reset', { root: true })
     this.playTheme()
     this.matches = await matchService.find()
   },
@@ -50,9 +51,9 @@ export default {
     this.stopTheme()
   },
   methods: {
-    playTheme() {
+    async playTheme() {
       this.ambiance = new Audio('/sounds/Menu Theme.mp3')
-      this.ambiance.play()
+      await this.ambiance.play()
     },
     stopTheme() {
       this.ambiance.pause()
