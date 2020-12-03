@@ -1,8 +1,16 @@
 <template>
   <div>
-    <v-sheet class="score mx-auto" light elevation="16" width="400" height="70">
+    <v-sheet
+      class="score mx-auto"
+      light
+      elevation="16"
+      max-width="600"
+      max-height="100"
+    >
       <div class="team">
-        <h5 class="name text-h5">{{ batmen.name }}</h5>
+        <div class="logo-left">
+          <v-img contain src="/logo-batman.png" max-width="100" />
+        </div>
         <div class="buttons">
           <v-icon small @click="incrementPoints(batmen)">mdi-plus</v-icon>
           <v-icon small @click="decrementPoints(batmen)">mdi-minus</v-icon>
@@ -16,7 +24,9 @@
           <v-icon small @click="incrementPoints(jokers)">mdi-plus</v-icon>
           <v-icon small @click="decrementPoints(jokers)">mdi-minus</v-icon>
         </div>
-        <h5 class="name text-h5">{{ jokers.name }}</h5>
+        <div class="logo-right">
+          <v-img contain src="/logo-joker.png" max-width="100" />
+        </div>
       </div>
     </v-sheet>
     <v-sheet class="timer mx-auto" elevation="16" width="100" height="40">
@@ -83,7 +93,7 @@ export default {
 .score {
   position: fixed;
   top: 0;
-  left: calc(50% - 200px);
+  left: calc(50% - 215px);
   display: flex;
   flex-flow: row;
   justify-content: center;
@@ -96,6 +106,14 @@ export default {
   display: flex;
   align-items: center;
   flex: 1 0 50%;
+}
+
+.logo-left {
+  padding-right: 16px;
+}
+
+.logo-right {
+  padding-left: 16px;
 }
 
 .points {
