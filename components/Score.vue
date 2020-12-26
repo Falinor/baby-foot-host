@@ -36,7 +36,9 @@
 </template>
 
 <script>
-import { config, delay } from '@/core'
+import { DateTime } from 'luxon'
+
+import { config } from '@/core'
 
 export default {
   props: {
@@ -44,35 +46,38 @@ export default {
       type: Array,
       required: true,
     },
+    startedAt: {
+      type: String,
+      required: true,
+    },
   },
   data: () => ({
-    timerCount: 0,
+    timer: null,
+    interval: null,
   }),
   computed: {
     batmen() {
-      return this.teams[0]
+      return (
+        this.teams?.length === 2 &&
+        this.teams.find((team) => team.name === 'Batman')
+      )
     },
     jokers() {
-      return this.teams[1]
-    },
-    timer() {
-      const minutes = Math.floor(this.timerCount / 60)
-      const seconds = Math.floor(this.timerCount % 60)
-      const pad = (time) => time.toString().padStart(2, '0')
-      return `${pad(minutes)}:${pad(seconds)}`
+      return (
+        this.teams?.length === 2 &&
+        this.teams.find((team) => team.name === 'Joker')
+      )
     },
   },
-  watch: {
-    timerCount: {
-      async handler(value) {
-        if (value < 1800) {
-          // 30min
-          await delay(1000)
-          this.timerCount++
-        }
-      },
-      immediate: true,
-    },
+  created() {
+    this.interval = setInterval(() => {
+      this.timer = DateTime.local()
+        .diff(DateTime.fromISO(this.startedAt))
+        .toFormat('mm:ss')
+    }, 1000)
+  },
+  destroyed() {
+    clearInterval(this.interval)
   },
   methods: {
     decrementPoints(team) {

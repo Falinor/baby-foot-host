@@ -1,20 +1,16 @@
 <template>
   <v-container fluid class="container">
     <soccer-ball />
-    <sound ref="goal" fade-in fade-out :playlist="goals" @ended="onGoalEnd" />
-    <sound
-      ref="ambiance"
-      fade-in
-      fade-out
-      autoplay
-      :playlist="ambiances"
-      :volume="4"
-    />
     <goal-animation ref="batmanAnimation" src="/batman.mp4" />
     <goal-animation ref="jokerAnimation" src="/joker.mp4" />
     <v-btn x-large @click="cancelMatch">Cancel Match</v-btn>
     <div>
-      <score :teams="teams" @increment="increment" @decrement="decrement" />
+      <score
+        :teams="teams"
+        :started-at="startedAt"
+        @increment="increment"
+        @decrement="decrement"
+      />
     </div>
     <v-dialog v-model="win" persistent fullscreen>
       <v-card>
@@ -27,7 +23,7 @@
       <v-card>
         <v-card-title class="headline">Validate last goal?</v-card-title>
         <v-card-text>
-          <center>
+          <center v-if="teams && teams.length">
             {{ teams[0].name }} {{ teams[0].points }} - {{ teams[1].points }}
             {{ teams[1].name }}
           </center>
@@ -46,22 +42,19 @@
 </template>
 
 <script>
-import { maxBy } from 'lodash'
-import { mapGetters } from 'vuex'
-
 import GoalAnimation from '@/components/GoalAnimation.vue'
 import Notification from '@/components/Notification.vue'
 import SoccerBall from '@/components/SoccerBall.vue'
-import Sound from '@/components/Sound'
-import { config, delay, end, GameMode, Scene } from '@/core'
-import { matchService, rankedGameService, streamService } from '@/services'
+import { config } from '@/core'
+import { matchService, streamService } from '@/services'
+import { maxBy } from 'lodash'
+import { mapGetters } from 'vuex'
+import { delay } from '../core'
 
 export default {
-  components: { GoalAnimation, Notification, Sound, SoccerBall },
+  components: { GoalAnimation, Notification, SoccerBall },
   data() {
     return {
-      sceneRotation: true,
-      goalNb: 0,
       win: false,
       winner: null,
       ambiances: [
@@ -99,9 +92,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('match', ['teams', 'mode']),
+    ...mapGetters('match', ['teams', 'mode', 'startedAt']),
     dialog() {
-      return this.teams.some((team) => team.points === config.maxPoints)
+      return this.teams?.some((team) => team.points === config.maxPoints)
     },
   },
   async created() {
@@ -112,105 +105,49 @@ export default {
       this.notification.text = 'Stream unavailable'
       this.notification.show = true
     }
-    if (this.mode === GameMode.RANKED) {
-      await rankedGameService.startAttraction()
-    }
   },
-  async mounted() {
-    matchService.onMatchUpdate((teamName) => {
-      const scoringTeam = this.teams.find((team) => team.name !== teamName)
-      this.increment(scoringTeam)
+  mounted() {
+    matchService.onGoalScored(async (teamName) => {
+      const team = this.$store.getters['match/team'](teamName)
+      if (team.points < config.maxPoints) {
+        team.name === 'Batman'
+          ? await this.$refs.batmanAnimation.play()
+          : await this.$refs.jokerAnimation.play()
+        this.$store.commit('match/increment', team.name)
+      }
     })
-    await this.playAmbiance()
-    this.startSceneRotation().catch()
   },
-  async destroyed() {
-    await streamService.switchScene(Scene.HOST)
-    await streamService.stopRecording()
-    streamService.disconnect()
+  destroyed() {
+    matchService.removeListeners()
   },
   methods: {
-    async playGoal() {
-      console.log('Playing goal')
-      this.$refs.ambiance.pause()
-      await this.$refs.goal.next()
-    },
-    async onGoalEnd() {
-      console.log('Goal end')
-      await this.playAmbiance()
-      this.startSceneRotation()
-    },
-    stopGoal() {
-      this.$refs.goal.pause()
-    },
-    async playAmbiance() {
-      console.log('Playing ambiance')
-      await this.$refs.ambiance.next()
-    },
-    stopAmbiance() {
-      this.$refs.ambiance.pause()
-    },
     async gameWinner() {
       this.win = true
-      this.$refs.ambiance.pause()
       const final = new Audio('/sounds/Final.mp3')
       final.volume = 1
-      await Promise.all([final.play(), this.$store.dispatch('match/endMatch')])
-      await end(final)
+      await Promise.all([final.play(), this.$store.dispatch('match/end')])
+      await delay(5)
       await this.$router.replace('/')
     },
     async cancelWinner() {
       this.win = false
-      await this.playAmbiance()
       const team = maxBy(this.teams, 'points')
-      this.$store.commit('match/decrementTeamPoints', team.name)
+      await this.$store.dispatch('match/decrement', team.name)
     },
     async cancelMatch() {
-      if (this.mode === GameMode.RANKED) {
-        await rankedGameService.stopAttraction()
-      }
+      await this.$store.dispatch('match/cancel')
       await this.$router.replace('/')
     },
     async increment(team) {
       if (team.points < config.maxPoints) {
-        this.stopSceneRotation()
         team.name === 'Batman'
           ? await this.$refs.batmanAnimation.play()
           : await this.$refs.jokerAnimation.play()
-        await streamService.switchScene(`Camera ${team.name}`)
-        await this.playGoal()
-        this.$store.commit('match/incrementTeamPoints', team.name)
-
-        if (team.points === config.maxPoints) {
-          this.winner = team
-          this.dialog = true
-        }
+        await this.$store.dispatch('match/increment', team.name)
       }
     },
-    decrement(team) {
-      this.$store.commit('match/decrementTeamPoints', team.name)
-    },
-    async startSceneRotation() {
-      this.sceneRotation = true
-      const scenes = [
-        { name: Scene.HOST, duration: 5000 },
-        { name: Scene.CAMERA_BATMAN, duration: 10000 },
-        { name: Scene.CAMERA_JOKER, duration: 10000 },
-      ]
-      const doSwitch = async (i) => {
-        try {
-          if (this.sceneRotation) {
-            const scene = scenes[i]
-            await streamService.switchScene(scene.name)
-            await delay(scene.duration)
-            await doSwitch((i + 1) % scenes.length)
-          }
-        } catch (err) {}
-      }
-      await doSwitch(0)
-    },
-    stopSceneRotation() {
-      this.sceneRotation = false
+    async decrement(team) {
+      await this.$store.dispatch('match/decrement', team.name)
     },
   },
 }

@@ -2,6 +2,9 @@
   <v-card light min-width="600">
     <v-card-text class="teams">
       <v-col v-for="(team, i) of filledTeams" :key="i" cols="6">
+        <div class="logo">
+          <v-img contain :src="logo(team)" max-width="200" />
+        </div>
         <div v-for="(player, j) of team.players" :key="j" class="player">
           <span class="text-h5" :style="{ color: team.color }">
             <template v-if="player">{{ player.nickname }}</template>
@@ -12,7 +15,13 @@
       </v-col>
     </v-card-text>
     <v-card-actions class="actions">
-      <v-btn x-large text color="accent" to="/match" :disabled="!canStart">
+      <v-btn
+        x-large
+        text
+        color="accent"
+        :disabled="!canStart"
+        @click="$emit('start')"
+      >
         Start
         <v-icon large right>mdi-soccer</v-icon>
       </v-btn>
@@ -33,11 +42,25 @@ export default {
       return this.teams.every((team) => team.players.length === 2)
     },
     filledTeams() {
-      return this.teams.map((team) => ({
-        ...team,
-        players:
-          team.players.length === 1 ? [...team.players, null] : team.players,
-      }))
+      const maxPlayers = 2
+      return this.teams.map((team) => {
+        if (team.players.length < maxPlayers) {
+          const nullPlayers = new Array(maxPlayers - team.players.length).fill(
+            null
+          )
+          return {
+            ...team,
+            players: [...team.players, ...nullPlayers],
+          }
+        }
+        return team
+      })
+    },
+  },
+  methods: {
+    logo(team) {
+      const name = team.name.toLowerCase()
+      return `/logo-${name}.png`
     },
   },
 }
@@ -56,6 +79,12 @@ export default {
 }
 
 .actions {
+  justify-content: center;
+}
+
+.logo {
+  height: 200px;
+  display: flex;
   justify-content: center;
 }
 </style>

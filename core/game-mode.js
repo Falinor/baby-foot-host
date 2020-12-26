@@ -1,4 +1,4 @@
 export const GameMode = {
-  RANKED: 'RANKED',
-  QUICKPLAY: 'QUICKPLAY',
+  RANKED: 'ranked',
+  QUICKPLAY: 'quickplay',
 }

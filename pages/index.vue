@@ -5,7 +5,7 @@
       <v-row>
         <v-col class="modes" cols="4">
           <v-btn to="/ranked" x-large text>Ranked game</v-btn>
-          <v-btn to="/match" x-large text>Quickplay</v-btn>
+          <v-btn x-large text @click="quickplay">Quickplay</v-btn>
         </v-col>
         <v-col cols="4">
           <matches :matches="matches" />
@@ -27,6 +27,7 @@ import Opening from '@/components/Opening.vue'
 import PlayerLeaderboard from '@/components/PlayerLeaderboard.vue'
 import TeamLeaderboard from '@/components/TeamLeaderboard.vue'
 import { matchService } from '@/services'
+import { GameMode, Status } from '@/core'
 
 export default {
   components: {
@@ -36,27 +37,22 @@ export default {
     Opening,
   },
   data: () => ({
-    ambiance: null,
     matches: [],
   }),
   computed: {
     ...mapGetters('app', ['playOpening']),
   },
   async mounted() {
-    this.$store.commit('match/reset', { root: true })
-    this.playTheme()
-    this.matches = await matchService.find()
-  },
-  destroyed() {
-    this.stopTheme()
+    this.matches = await matchService.find().catch(console.log)
   },
   methods: {
-    async playTheme() {
-      this.ambiance = new Audio('/sounds/Menu Theme.mp3')
-      await this.ambiance.play()
-    },
-    stopTheme() {
-      this.ambiance.pause()
+    async quickplay() {
+      const { status } = this.$store.state.app
+      const { match } = this.$store.state
+      if (!match || status === Status.FREE) {
+        await this.$store.dispatch('match/start', GameMode.QUICKPLAY)
+      }
+      await this.$router.push('/match')
     },
   },
 }

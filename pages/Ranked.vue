@@ -8,16 +8,18 @@
       <h2 class="title">Creating Ranked Game</h2>
     </v-row>
     <v-row justify="center" align="center">
-      <teams :teams="teams" />
+      <teams :teams="teams" @start="start" />
     </v-row>
   </v-container>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
 import Teams from '@/components/Teams.vue'
 import { GameMode } from '@/core'
+import { matchService } from '@/services'
+import { delay } from '../core'
 
 export default {
   components: {
@@ -27,17 +29,18 @@ export default {
     interval: null,
   }),
   computed: mapGetters('match', ['teams']),
-  async created() {
-    this.$store.commit('match/setGameMode', GameMode.RANKED)
-    await this.fetchAttraction()
+  created() {
+    matchService.onTeamsUpdate((teams) => {
+      this.$store.commit('match/setTeams', teams)
+    })
   },
-  mounted() {
-    this.interval = setInterval(this.fetchAttraction, 5000)
+  methods: {
+    async start() {
+      await this.$store.dispatch('match/start', GameMode.RANKED)
+      await delay(5000)
+      await this.$router.push('/match')
+    },
   },
-  destroyed() {
-    clearInterval(this.interval)
-  },
-  methods: mapActions('app', ['fetchAttraction']),
 }
 </script>
 

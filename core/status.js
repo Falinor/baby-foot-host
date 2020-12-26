@@ -1,5 +1,5 @@
 export const Status = {
-  FREE: 'FREE',
-  TEAMING_UP: 'TEAMING_UP',
-  PLAYING: 'PLAYING',
+  FREE: 'free',
+  TEAMING_UP: 'teamingUp',
+  PLAYING: 'playing',
 }
